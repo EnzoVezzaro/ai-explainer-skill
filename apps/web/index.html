@@ -79,9 +79,15 @@
       <span class="badge primary">OpenCode</span>
       <span class="badge">Cursor (compatible)</span>
       <span class="badge">More via adapters</span>
+      <span class="badge primary">gitbot</span>
     </div>
     <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--color-text-muted);">
       Uses each harness's native skill directory and metadata. Project-level and user-level installs where the provider allows them. No unified slash-command mechanism is invented.
+      <br><br>You can also run Video Skill as a gitbot bot — a coding-agent instance whose standing job is the video-skill workflow. Start it locally:
+    </p>
+    <pre style="background:#0f172a;color:#e2e8f0;border:1px solid var(--color-border);border-radius:var(--radius);padding:1rem;margin:0.75rem 0;"><code>gitbot start</code></pre>
+    <p style="font-size:0.875rem;color:var(--color-text-muted);margin-bottom:0;">
+      Then create the Video Skill bot (<code>scripts/create-gitbot-video-skill-bot.mjs</code>) and open the hub at <code>http://localhost:3000</code>.
     </p>
   </div>
 </section>
