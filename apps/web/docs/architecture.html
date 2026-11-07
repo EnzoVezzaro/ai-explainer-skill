@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Architecture — Video Skill</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="brand">Video <span class="accent">Skill</span></div>
+  <div class="nav-links">
+    <a href="../index.html">Home</a>
+    <a href="index.html">Documentation</a>
+    <a href="installation.html">Installation</a>
+    <a href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</nav>
+
+<div class="container section">
+  <span class="label">Architecture</span>
+  <h1>System architecture</h1>
+  <pre><code>Website → CLI installer → Agent Skill → Existing AI coding harness → Verified result</code></pre>
+  <ul>
+    <li><strong>Website</strong> — discovery, onboarding, docs, examples, bounded playground. Decoupled from the skill runtime.</li>
+    <li><strong>CLI</strong> — npm-distributed toolkit for install, configure, maintain, learn, create, validate.</li>
+    <li><strong>Core Agent Skill</strong> — <code>video-skill</code> with Learn / Explain / Create / Build / Verify / Improve.</li>
+    <li><strong>Existing harness</strong> — does reasoning, code editing, shell execution, and workspace operations with user permissions.</li>
+  </ul>
+
+  <h2>Repository layout</h2>
+  <pre><code>video-skill/
+├── apps/web/          # landing, docs, playground, examples
+├── packages/
+│   ├── cli/           # npm CLI
+│   ├── core/          # shared contracts
+│   ├── agent-reach-adapter/  # video retrieval integration
+│   ├── video-analyzer/       # evidence extraction
+│   ├── skill-compiler/       # Agent Skill generation
+│   ├── skill-evaluator/      # validation &amp; evaluation
+│   └── installers/           # harness-specific install adapters
+├── skills/video-skill/  # portable core skill
+└── tests/               # unit + e2e tests</code></pre>
+
+  <h2>Design principles</h2>
+  <ul>
+    <li>One installable skill system, one CLI, one website, multiple coding agents.</li>
+    <li>Core skill stays portable; provider-specific differences live in installers.</li>
+    <li>Website is decoupled from the skill runtime.</li>
+    <li>No hosted database or product API required for basic CLI/Skill operation.</li>
+    <li>Playground server-side jobs are bounded, isolated, and abuse-controlled.</li>
+    <li>All external video content is untrusted.</li>
+  </ul>
+</div>
+
+<footer style="margin-top:3rem;">
+  <div class="container" style="display:flex; flex-wrap:wrap; gap:1rem; align-items:center; justify-content:space-between;">
+    <div>Video Skill &mdash; one installable skill system, one CLI, one website, multiple coding agents.</div>
+    <div><a href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">GitHub</a></div>
+  </div>
+</footer>
+
+</body>
+</html>

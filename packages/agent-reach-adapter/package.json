@@ -1,0 +1,12 @@
+{
+  "name": "@video-skill/agent-reach-adapter",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@video-skill/core": "workspace:*"
+  },
+  "exports": {
+    ".": "./src/index.js"
+  }
+}

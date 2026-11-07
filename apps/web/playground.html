@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Playground — Video Skill</title>
+<meta name="description" content="Paste a public tutorial video URL to explain it, create a reusable Agent Skill, or build an execution plan.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="brand">Video <span class="accent">Skill</span></div>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="docs/">Documentation</a>
+    <a href="examples.html">Examples</a>
+    <a href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">GitHub</a>
+  </div>
+  <button class="menu-btn" aria-label="Open menu" aria-expanded="false">&#9776;</button>
+  <div class="mobile-menu">
+    <a href="index.html">Home</a>
+    <a href="docs/">Documentation</a>
+    <a href="examples.html">Examples</a>
+    <a href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</nav>
+
+<div class="container section">
+  <span class="label">Interactive playground</span>
+  <h1>Extract, create, build</h1>
+  <p>Paste a public instructional video URL. Choose what you want to do. This prepares artifacts — execution happens in your coding harness with your authorization.</p>
+
+  <div class="playground">
+    <div class="field">
+      <label for="vs-url">Public video URL</label>
+      <input id="vs-url" type="url" placeholder="https://www.youtube.com/watch?v=... or a Bilibili/other public video link">
+      <p style="font-size:0.8rem; color:var(--color-text-muted);">YouTube and Bilibili are supported via Agent Reach; other public URLs use a generic read fallback.</p>
+    </div>
+    <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem;">
+      <button id="vs-explain" class="btn">Explain</button>
+      <button id="vs-create" class="btn btn-outline">Create Skill</button>
+      <button id="vs-build" class="btn btn-secondary">Build</button>
+    </div>
+    <div id="vs-status"></div>
+    <pre id="vs-output" class="output"></pre>
+  </div>
+
+  <div class="alert alert-warn" style="margin-top:1rem;">
+    <strong>Build ≠ Execute.</strong> The Build action prepares an executable skill and execution plan. The actual tutorial workflow runs in your selected coding harness (Codex, Claude Code, OpenCode, Cursor) only after you install the skill and authorize consequential operations. This playground does not execute code on your behalf and never stores coding-agent credentials.
+  </div>
+
+  <div style="margin-top:1.5rem;">
+    <h3>What you get</h3>
+    <ul>
+      <li><strong>Explain</strong> — a clear technical walkthrough of the tutorial, with evidence labeled as spoken / visible / description / external-doc / inference.</li>
+      <li><strong>Create Skill</strong> — a downloadable Agent Skill folder (<code>SKILL.md</code> + <code>references/</code>) you can install into your coding agent.</li>
+      <li><strong>Build</strong> — the generated skill plus an execution plan and a copyable command for your coding harness.</li>
+    </ul>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

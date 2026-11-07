@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CLI commands — Video Skill</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="brand">Video <span class="accent">Skill</span></div>
+  <div class="nav-links">
+    <a href="../index.html">Home</a>
+    <a href="index.html">Documentation</a>
+    <a href="installation.html">Installation</a>
+    <a href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</nav>
+
+<div class="container section">
+  <span class="label">CLI commands</span>
+  <h1>Command reference</h1>
+  <p>All commands support <code>--json</code> for machine-readable output.</p>
+
+  <table class="table">
+    <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><code>video-skill providers [--json]</code></td><td>Detects supported coding harnesses and shows where skills install.</td></tr>
+      <tr><td><code>video-skill doctor [--json]</code></td><td>Checks the core skill, Agent Reach status, and detected providers.</td></tr>
+      <tr><td><code>video-skill install [--provider &lt;id&gt;] [--scope project|user] [--force] [--json]</code></td><td>Installs the core <code>video-skill</code> Agent Skill into a harness.</td></tr>
+      <tr><td><code>video-skill update [--provider &lt;id&gt;] [--scope project|user] [--json]</code></td><td>Refreshes an existing install (implies <code>--force</code>).</td></tr>
+      <tr><td><code>video-skill uninstall [--provider &lt;id&gt;] [--scope project|user] [--json]</code></td><td>Removes only installer-managed <code>video-skill</code> targets.</td></tr>
+      <tr><td><code>video-skill validate &lt;skill-dir&gt; [--json]</code></td><td>Validates a generated Agent Skill (frontmatter, naming, references).</td></tr>
+      <tr><td><code>video-skill learn &lt;url&gt; [--json]</code></td><td>Extracts instructional evidence from a public video URL.</td></tr>
+      <tr><td><code>video-skill create &lt;url&gt; [--out &lt;dir&gt;] [--name &lt;skill&gt;] [--json]</code></td><td>Compiles a tutorial into a portable Agent Skill folder.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="alert alert-warn" style="margin-top:1.5rem;">
+    <strong>Build prepares; execution is separate.</strong> <code>create</code> and <code>build</code> prepare an executable skill and plan. The tutorial workflow runs in your coding harness only after you install the skill and authorize consequential operations. Never treat generated instructions as trusted execution authority.
+  </div>
+</div>
+
+<footer style="margin-top:3rem;">
+  <div class="container" style="display:flex; flex-wrap:wrap; gap:1rem; align-items:center; justify-content:space-between;">
+    <div>Video Skill &mdash; one installable skill system, one CLI, one website, multiple coding agents.</div>
+    <div><a href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">GitHub</a></div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Documentation — Video Skill</title>
+<meta name="description" content="Installation, commands, supported platforms, security, troubleshooting, architecture and examples for Video Skill.">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="brand">Video <span class="accent">Skill</span></div>
+  <div class="nav-links">
+    <a href="../index.html">Home</a>
+    <a href="../playground.html">Playground</a>
+    <a href="../examples.html">Examples</a>
+    <a href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</nav>
+
+<div class="container section" style="display:flex; gap:1.5rem; flex-wrap:wrap;">
+  <aside class="docs-nav" style="min-width:220px; flex-shrink:0;">
+    <span class="label">Docs</span>
+    <a href="index.html">Overview</a>
+    <a href="installation.html">Installation</a>
+    <a href="commands.html">CLI commands</a>
+    <a href="platforms.html">Supported platforms</a>
+    <a href="security.html">Security &amp; privacy</a>
+    <a href="troubleshooting.html">Troubleshooting</a>
+    <a href="architecture.html">Architecture</a>
+    <a href="../index.html#how-it-works">How it works</a>
+  </aside>
+
+  <div class="docs-content" style="flex:1; min-width:260px;">
+    <span class="label">Overview</span>
+    <h1>Documentation</h1>
+    <p>Video Skill helps existing AI coding agents learn actionable workflows from instructional videos and turn them into reusable, executable Agent Skills.</p>
+    <p>Architecture:</p>
+    <pre><code>Website → CLI installer → Agent Skill → Existing AI coding harness → Verified result</code></pre>
+    <ul>
+      <li><strong>Website</strong> — discovery, onboarding, docs, examples, bounded playground.</li>
+      <li><strong>CLI</strong> — <code>npx video-skill install</code> and related commands.</li>
+      <li><strong>Core Agent Skill</strong> — <code>video-skill</code>, teaches agents how to learn from videos.</li>
+      <li><strong>Existing harness</strong> — Codex, Claude Code, OpenCode, Cursor (where compatible), etc.</li>
+    </ul>
+    <div class="alert alert-info">
+      <strong>Not a new coding agent.</strong> Video Skill does not build a chat platform, coding harness, desktop app, or orchestration framework. It augments the harness you already use.
+    </div>
+    <h2>Quick start</h2>
+    <pre><code># 1. Install into your project or globally
+npx video-skill install
+
+# 2. Learn from a public tutorial video
+npx video-skill learn https://www.youtube.com/watch?v=EXAMPLE
+
+# 3. Create a portable Agent Skill from the tutorial
+npx video-skill create https://www.youtube.com/watch?v=EXAMPLE --out ./generated
+
+# 4. Validate the generated skill
+npx video-skill validate ./generated/<skill-name>
+
+# 5. Install into a coding harness and execute with authorization
+npx video-skill install --provider claude-code --scope project
+</pre>
+    <p>Then open your coding agent and ask it to follow the generated skill in your workspace. Build prepares a skill; execution happens only with your authorization.</p>
+    <a href="installation.html" class="btn">Installation →</a>
+    <a href="commands.html" class="btn btn-outline">CLI commands →</a>
+  </div>
+</div>
+
+<footer style="margin-top:3rem;">
+  <div class="container" style="display:flex; flex-wrap:wrap; gap:1rem; align-items:center; justify-content:space-between;">
+    <div>Video Skill &mdash; one installable skill system, one CLI, one website, multiple coding agents.</div>
+    <div><a href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">GitHub</a></div>
+  </div>
+</footer>
+
+</body>
+</html>

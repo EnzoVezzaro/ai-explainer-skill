@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Security &amp; privacy — Video Skill</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="brand">Video <span class="accent">Skill</span></div>
+  <div class="nav-links">
+    <a href="../index.html">Home</a>
+    <a href="index.html">Documentation</a>
+    <a href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</nav>
+
+<div class="container section">
+  <span class="label">Security &amp; privacy</span>
+  <h1>Security model</h1>
+  <p>Every external video, description, transcript, caption, and generated instruction is treated as <strong>untrusted input</strong>.</p>
+
+  <ul>
+    <li><strong>No credential storage.</strong> The website never stores or handles your API keys or coding-agent credentials.</li>
+    <li><strong>No DRM/platform bypass.</strong> Video Skill does not bypass provider authentication, platform protections, or DRM.</li>
+    <li><strong>SSRF-safe retrieval.</strong> Hosted retrieval uses restrictive URL validation and private/local-network host blocking.</li>
+    <li><strong>Prompt-injection resistance.</strong> Generated instructions are never treated as trusted execution authority.</li>
+    <li><strong>Explicit authorization.</strong> Destructive or privileged operations require explicit approval before running.</li>
+    <li><strong>Evidence without secrets.</strong> Execution logs preserve evidence while redacting secrets.</li>
+    <li><strong>Safe archives.</strong> Generated skill archives cannot write outside intended directories when extracted.</li>
+  </ul>
+
+  <div class="card" style="margin-top:1rem;">
+    <span class="label">Evidence labeling</span>
+    <p>Every extracted instruction is labeled by source type: <code>spoken</code>, <code>visible</code>, <code>description</code>, <code>external-doc</code>, or <code>inference</code>, with timestamps and source references where available. Nothing is fabricated.</p>
+  </div>
+
+  <div class="card" style="margin-top:1rem;">
+    <span class="label">Verification honesty</span>
+    <p>A tutorial is never reported as reproduced unless real commands, tests, logs, or screenshots were observed in the current environment. Simulations are never presented as verified executions.</p>
+  </div>
+</div>
+
+<footer style="margin-top:3rem;">
+  <div class="container" style="display:flex; flex-wrap:wrap; gap:1rem; align-items:center; justify-content:space-between;">
+    <div>Video Skill &mdash; one installable skill system, one CLI, one website, multiple coding agents.</div>
+    <div><a href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">GitHub</a></div>
+  </div>
+</footer>
+
+</body>
+</html>

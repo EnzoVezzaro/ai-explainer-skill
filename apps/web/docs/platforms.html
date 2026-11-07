@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Supported platforms — Video Skill</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="brand">Video <span class="accent">Skill</span></div>
+  <div class="nav-links">
+    <a href="../index.html">Home</a>
+    <a href="index.html">Documentation</a>
+    <a href="installation.html">Installation</a>
+    <a href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</nav>
+
+<div class="container section">
+  <span class="label">Supported platforms</span>
+  <h1>Coding harnesses</h1>
+  <table class="table">
+    <thead><tr><th>Harness</th><th>Native skill location</th><th>Scope</th></tr></thead>
+    <tbody>
+      <tr><td>Codex CLI</td><td><code>.agents/skills</code> / <code>~/.agents/skills</code></td><td>Project + user</td></tr>
+      <tr><td>Claude Code</td><td><code>.claude/skills</code> / <code>~/.claude/skills</code></td><td>Project + user</td></tr>
+      <tr><td>OpenCode</td><td><code>.opencode/skills</code> / <code>~/.config/opencode/skills</code></td><td>Project + user</td></tr>
+      <tr><td>Cursor</td><td><code>.cursor/skills</code> / <code>~/.cursor/skills</code></td><td>Where compatible</td></tr>
+      <tr><td>More via adapters</td><td>Adapter-specific</td><td>Depends on provider</td></tr>
+    </tbody>
+  </table>
+  <p>Installers use each harness's native skill directory and metadata. No unified slash-command mechanism is invented.</p>
+
+  <h2>Video sources</h2>
+  <table class="table">
+    <thead><tr><th>Source</th><th>Retrieval</th><th>Transcript / captions</th></tr></thead>
+    <tbody>
+      <tr><td>YouTube</td><td>Agent Reach <code>youtube read</code></td><td><code>youtube subtitle</code>; Whisper fallback when configured</td></tr>
+      <tr><td>Bilibili</td><td>Agent Reach <code>bilibili read</code></td><td><code>bilibili subtitle</code> (may need login)</td></tr>
+      <tr><td>Other public video/page</td><td>Agent Reach <code>read</code></td><td>Generic fallback; visual-only steps flagged</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<footer style="margin-top:3rem;">
+  <div class="container" style="display:flex; flex-wrap:wrap; gap:1rem; align-items:center; justify-content:space-between;">
+    <div>Video Skill &mdash; one installable skill system, one CLI, one website, multiple coding agents.</div>
+    <div><a href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">GitHub</a></div>
+  </div>
+</footer>
+
+</body>
+</html>

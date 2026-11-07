@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Video Skill — Turn video tutorials into skills your AI agent can execute</title>
+<meta name="description" content="Give your coding agent a video URL. It extracts the explanation, learns the workflow, creates a reusable skill, and helps you reproduce the result.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="brand">Video <span class="accent">Skill</span></div>
+  <div class="nav-links">
+    <a href="#how-it-works">How it works</a>
+    <a href="docs/">Documentation</a>
+    <a href="examples.html">Examples</a>
+    <a href="playground.html">Playground</a>
+    <a href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">GitHub</a>
+  </div>
+  <button class="menu-btn" aria-label="Open menu" aria-expanded="false">&#9776;</button>
+  <div class="mobile-menu">
+    <a href="#how-it-works">How it works</a>
+    <a href="docs/">Documentation</a>
+    <a href="examples.html">Examples</a>
+    <a href="playground.html">Playground</a>
+    <a href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container">
+    <span class="eyebrow">Web-distributed video intelligence for AI coding agents</span>
+    <h1>Turn video tutorials into skills your AI agent can execute.</h1>
+    <p class="lead">Give your coding agent a public video URL. It extracts the explanation, learns the workflow, creates a reusable Agent Skill, and helps you reproduce the result — inside your existing coding harness.</p>
+    <div class="install-card">
+      <span class="label">Install the CLI</span>
+      <pre><code>npx video-skill install</code></pre>
+      <div class="install-actions">
+        <a href="playground.html" class="btn btn-outline btn-sm">Try the playground</a>
+        <a href="docs/" class="btn btn-secondary btn-sm">Read the docs</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="how-it-works" class="section">
+  <div class="container">
+    <span class="label">How it works</span>
+    <h2>Website → CLI → Agent Skill → Your coding agent → Verified result</h2>
+    <div class="grid grid-cols-2" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+      <div class="card">
+        <div class="label">1. Learn</div>
+        <p>Paste a public tutorial video URL. Video Skill retrieves metadata, transcript/captions, chapters, links, tools, and demonstrated actions.</p>
+      </div>
+      <div class="card">
+        <div class="label">2. Explain</div>
+        <p>Turns the video into a clear technical walkthrough, separating spoken instructions from visible demos, external docs, and inference.</p>
+      </div>
+      <div class="card">
+        <div class="label">3. Create</div>
+        <p>Compiles the tutorial into a portable Agent Skill (<code>SKILL.md</code> + references) using Skill Creator conventions.</p>
+      </div>
+      <div class="card">
+        <div class="label">4. Build / Verify</div>
+        <p>Hands the skill to Codex, Claude Code, OpenCode, or Cursor for execution with your authorization, then confirms real results.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="container">
+    <span class="label">Supported coding agents</span>
+    <h2>Installs into your harness natively</h2>
+    <div class="grid grid-cols-3" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; margin-top: 1rem;">
+      <span class="badge primary">Codex CLI</span>
+      <span class="badge primary">Claude Code</span>
+      <span class="badge primary">OpenCode</span>
+      <span class="badge">Cursor (compatible)</span>
+      <span class="badge">More via adapters</span>
+    </div>
+    <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--color-text-muted);">
+      Uses each harness's native skill directory and metadata. Project-level and user-level installs where the provider allows them. No unified slash-command mechanism is invented.
+    </p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <span class="label">Interactive playground</span>
+    <h2>Generate a skill without installing</h2>
+    <p>Paste a public tutorial video URL and run <strong>Explain</strong>, <strong>Create Skill</strong>, or <strong>Build</strong>. The preview shows extraction status, the generated skill, references, and an execution plan.</p>
+    <a href="playground.html" class="btn">Open the playground</a>
+    <p style="margin-top: 0.75rem; font-size: 0.875rem; color: var(--color-text-muted);">
+      The playground runs bounded, isolated analysis jobs. It never asks for your coding-agent credentials and is not a cloud IDE. Build prepares a skill; it does not execute it.
+    </p>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="container">
+    <span class="label">Examples gallery</span>
+    <h2>Real tutorials, real artifacts</span>
+    <p>See the video source, extracted workflow, generated skill artifact, and observed execution results. Simulations are never presented as verified executions.</p>
+    <a href="examples.html" class="btn">View examples</a>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <span class="label">Documentation</span>
+    <h2>Install, commands, security, architecture</span>
+    <p>Real commands and tested examples for installation, CLI usage, supported platforms, security, troubleshooting, and architecture.</p>
+    <a href="docs/" class="btn">Go to documentation</a>
+  </div>
+</section>
+
+<footer>
+  <div class="container" style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between;">
+    <div>Video Skill &mdash; one installable skill system, one CLI, one website, multiple coding agents.</div>
+    <div>
+      <a href="docs/security.html">Security</a>
+      <a href="https://github.com/EnzoVezzaro/ai-explainer-skill/issues" target="_blank" rel="noopener">Issues</a>
+      <a href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
