@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Troubleshooting — Video Skill</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="brand">Video <span class="accent">Skill</span></div>
+  <div class="nav-links">
+    <a href="../index.html">Home</a>
+    <a href="index.html">Documentation</a>
+    <a href="installation.html">Installation</a>
+    <a href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</nav>
+
+<div class="container section">
+  <span class="label">Troubleshooting</span>
+  <h1>Common issues</h1>
+
+  <table class="table">
+    <thead><tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td><code>video-skill: command not found</code></td><td>CLI not installed or not on PATH</td><td>Run <code>npx video-skill install</code> or add npm bin to PATH</td></tr>
+      <tr><td>No providers detected</td><td>No supported coding harness config found</td><td>Open Codex/Claude Code/OpenCode/Cursor once, then rerun <code>providers</code></td></tr>
+      <tr><td>Target already exists</td><td>Skill folder present without <code>--force</code></td><td>Use <code>--force</code> to replace installer-managed files</td></tr>
+      <tr><td>Agent Reach not installed</td><td><code>agent-reach</code> not on PATH</td><td>Install Agent Reach, or use a configured retrieval fallback</td></tr>
+      <tr><td>No transcript retrieved</td><td>Captions unavailable or login-walled</td><td>Transcript gaps are reported as limitations; inspect the video directly</td></tr>
+      <tr><td>Generated skill fails validation</td><td>Bad frontmatter/name or missing references</td><td>Run <code>validate &lt;dir&gt;</code> and fix the reported issues</td></tr>
+    </tbody>
+  </table>
+
+  <div class="card" style="margin-top:1rem;">
+    <span class="label">Run the doctor</span>
+    <pre><code>npx video-skill doctor --json</code></pre>
+    <p>Shows core-skill validity, Agent Reach status, and detected providers in one place.</p>
+  </div>
+</div>
+
+<footer style="margin-top:3rem;">
+  <div class="container" style="display:flex; flex-wrap:wrap; gap:1rem; align-items:center; justify-content:space-between;">
+    <div>Video Skill &mdash; one installable skill system, one CLI, one website, multiple coding agents.</div>
+    <div><a href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">GitHub</a></div>
+  </div>
+</footer>
+
+</body>
+</html>

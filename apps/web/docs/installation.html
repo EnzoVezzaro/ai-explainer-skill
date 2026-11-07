@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Installation — Video Skill</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="brand">Video <span class="accent">Skill</span></div>
+  <div class="nav-links">
+    <a href="../index.html">Home</a>
+    <a href="index.html">Documentation</a>
+    <a href="commands.html">CLI commands</a>
+    <a href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</nav>
+
+<div class="container section">
+  <span class="label">Installation</span>
+  <h1>Install Video Skill</h1>
+  <p>Install the CLI once, then install the core <code>video-skill</code> Agent Skill into your coding harness.</p>
+
+  <div class="card" style="margin-top:1rem;">
+    <span class="label">Step 1 — Install the CLI</span>
+    <pre><code>npx video-skill install</code></pre>
+    <p>This installs the <code>video-skill</code> npm package and runs the harness detector.</p>
+  </div>
+
+  <div class="card" style="margin-top:1rem;">
+    <span class="label">Step 2 — Choose project or global scope</span>
+    <p>The installer detects your coding harnesses and offers project-level or user-level installation where the provider allows it.</p>
+    <pre><code># Project-scoped (recommended, committed with the repo)
+npx video-skill install --scope project
+
+# User-scoped (available across your projects)
+npx video-skill install --scope user
+
+# Target a specific harness
+npx video-skill install --provider claude-code --scope project
+</pre>
+  </div>
+
+  <div class="card" style="margin-top:1rem;">
+    <span class="label">Step 3 — Reload your coding agent</span>
+    <p>Reload Codex, Claude Code, OpenCode, or Cursor so it discovers the installed skill.</p>
+  </div>
+
+  <h2>Uninstall / update</h2>
+  <pre><code>npx video-skill update      # refresh an existing install
+npx video-skill uninstall     # remove only installer-managed video-skill targets
+</pre>
+  <p>Install, update, and uninstall are safe and reversible. The installer never overwrites existing files without confirmation (<code>--force</code> to override).</p>
+
+  <h2>Detected providers</h2>
+  <p>Run <code>npx video-skill providers</code> to see which coding agents are detected on your machine and where skills would be installed.</p>
+
+  <div class="alert alert-info">
+    <strong>No hosted database, proprietary account, or product API is required</strong> for basic CLI or Skill operation. Video retrieval uses Agent Reach where configured.
+  </div>
+</div>
+
+<footer style="margin-top:3rem;">
+  <div class="container" style="display:flex; flex-wrap:wrap; gap:1rem; align-items:center; justify-content:space-between;">
+    <div>Video Skill &mdash; one installable skill system, one CLI, one website, multiple coding agents.</div>
+    <div><a href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">GitHub</a></div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "name": "video-skill-workspace",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Web-distributed video intelligence skill system for AI coding agents",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@10.0.0",
+  "scripts": {
+    "test": "node --test tests/unit/*.test.js",
+    "test:e2e": "node --test tests/e2e/*.test.js",
+    "lint": "echo \"Lint to be added\"",
+    "typecheck": "echo \"Typecheck to be added\""
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.0"
+  },
+  "dependencies": {
+    "video-skill": "file:packages/cli/video-skill-1.0.0.tgz"
+  }
+}

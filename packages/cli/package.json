@@ -1,0 +1,23 @@
+{
+  "name": "video-skill",
+  "version": "1.0.0",
+  "description": "Turn video tutorials into reusable, executable Agent Skills for existing AI coding agents.",
+  "license": "MIT",
+  "author": "Enzo Vezzaro",
+  "homepage": "https://github.com/EnzoVezzaro/ai-explainer-skill",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EnzoVezzaro/ai-explainer-skill.git"
+  },
+  "bugs": {
+    "url": "https://github.com/EnzoVezzaro/ai-explainer-skill/issues"
+  },
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "bin": { "video-skill": "./src/cli.js" },
+  "files": ["src/", "README.md", "LICENSE"],
+  "keywords": ["video", "tutorial", "skill", "agent", "ai", "coding-agent", "codex", "claude-code", "opencode", "cursor"],
+  "scripts": {
+    "test": "echo \"Run tests from the repository root: node --test tests/unit/*.test.js tests/e2e/cli.spec.js\""
+  }
+}
