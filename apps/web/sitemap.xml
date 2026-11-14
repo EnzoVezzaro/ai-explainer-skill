@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>/index.html</loc></url>
+  <url><loc>/playground.html</loc></url>
+  <url><loc>/examples.html</loc></url>
+  <url><loc>/docs/</loc></url>
+  <url><loc>/docs/installation.html</loc></url>
+  <url><loc>/docs/commands.html</loc></url>
+  <url><loc>/docs/platforms.html</loc></url>
+  <url><loc>/docs/security.html</loc></url>
+  <url><loc>/docs/troubleshooting.html</loc></url>
+  <url><loc>/docs/architecture.html</loc></url>
+</urlset>

@@ -10,15 +10,14 @@
   },
   "packageManager": "pnpm@10.0.0",
   "scripts": {
-    "test": "node --test tests/unit/*.test.js",
-    "test:e2e": "node --test tests/e2e/*.test.js",
+    "dev": "node packages/server/src/index.js",
+    "dev:web": "node tests/e2e/serve.js apps/web 5173",
+    "test": "node --test tests/unit/*.test.js tests/e2e/cli.spec.js",
+    "test:e2e": "node_modules/.bin/playwright test --config tests/e2e/playwright.config.js",
     "lint": "echo \"Lint to be added\"",
     "typecheck": "echo \"Typecheck to be added\""
   },
   "devDependencies": {
     "@playwright/test": "^1.65.0"
-  },
-  "dependencies": {
-    "video-skill": "file:packages/cli/video-skill-1.0.0.tgz"
   }
 }

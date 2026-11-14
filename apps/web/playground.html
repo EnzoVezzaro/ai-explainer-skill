@@ -5,61 +5,90 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Playground — Video Skill</title>
 <meta name="description" content="Paste a public tutorial video URL to explain it, create a reusable Agent Skill, or build an execution plan.">
+<meta name="theme-color" content="#0f6bff">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f6bff'/%3E%3Cpath d='M13 10.5v11l9-5.5z' fill='white'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<nav class="nav">
-  <div class="brand">Video <span class="accent">Skill</span></div>
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="nav-wrap">
+<nav class="nav" aria-label="Primary">
+  <a class="brand" href="index.html">Video <span class="accent">Skill</span></a>
   <div class="nav-links">
     <a href="index.html">Home</a>
     <a href="docs/">Documentation</a>
     <a href="examples.html">Examples</a>
+    <a href="playground.html" aria-current="page">Playground</a>
     <a href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">GitHub</a>
   </div>
-  <button class="menu-btn" aria-label="Open menu" aria-expanded="false">&#9776;</button>
-  <div class="mobile-menu">
-    <a href="index.html">Home</a>
-    <a href="docs/">Documentation</a>
-    <a href="examples.html">Examples</a>
-    <a href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">GitHub</a>
-  </div>
+  <button class="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">☰</button>
 </nav>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="index.html">Home</a>
+  <a href="docs/">Documentation</a>
+  <a href="examples.html">Examples</a>
+  <a href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">GitHub</a>
+</div>
+</div>
 
-<div class="container section">
+<main id="main" class="container section">
+  <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a> · Playground</nav>
   <span class="label">Interactive playground</span>
   <h1>Extract, create, build</h1>
-  <p>Paste a public instructional video URL. Choose what you want to do. This prepares artifacts — execution happens in your coding harness with your authorization.</p>
+  <p class="lead">Paste a public instructional video URL. Choose what you want to do. This prepares artifacts — execution happens in your coding harness with your authorization.</p>
 
   <div class="playground">
     <div class="field">
       <label for="vs-url">Public video URL</label>
-      <input id="vs-url" type="url" placeholder="https://www.youtube.com/watch?v=... or a Bilibili/other public video link">
-      <p style="font-size:0.8rem; color:var(--color-text-muted);">YouTube and Bilibili are supported via Agent Reach; other public URLs use a generic read fallback.</p>
+      <div class="field-row">
+        <input id="vs-url" type="url" inputmode="url" autocomplete="url" placeholder="https://www.youtube.com/watch?v=… or a Bilibili / Vimeo / public video link" aria-describedby="vs-hint vs-error" spellcheck="false">
+        <button id="vs-clear" class="btn btn-secondary" type="button" aria-label="Clear URL">Clear</button>
+      </div>
+      <p class="hint" id="vs-hint">YouTube and Bilibili are supported via Agent Reach; other public URLs use a generic read fallback. Private/local hosts are blocked.</p>
+      <p class="field-error" id="vs-error" role="alert"></p>
+      <div class="sample-links" aria-label="Try a sample">
+        <span>Try:</span>
+        <button type="button" data-sample-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ">YouTube sample</button>
+        <button type="button" data-sample-url="https://vimeo.com/76979871">Vimeo sample</button>
+        <button type="button" data-sample-url="https://www.bilibili.tv/en/video/2049329657">Bilibili sample</button>
+      </div>
     </div>
-    <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem;">
-      <button id="vs-explain" class="btn">Explain</button>
-      <button id="vs-create" class="btn btn-outline">Create Skill</button>
-      <button id="vs-build" class="btn btn-secondary">Build</button>
+    <div class="action-bar">
+      <button id="vs-explain" class="btn" type="button">Explain</button>
+      <button id="vs-create" class="btn btn-outline" type="button">Create Skill</button>
+      <button id="vs-build" class="btn btn-secondary" type="button">Build</button>
+      <span class="spacer"></span>
+      <span class="muted" style="font-size:0.84rem;">Enter = Explain</span>
     </div>
-    <div id="vs-status"></div>
-    <pre id="vs-output" class="output"></pre>
+    <div class="progress" id="vs-progress" role="status" aria-live="polite"><span class="spinner" aria-hidden="true"></span><span id="vs-status">Working…</span></div>
+    <div id="vs-status-sr" class="sr-only" aria-live="polite"></div>
+    <div class="result" id="vs-result" aria-live="polite"></div>
+    <pre id="vs-output" class="output" tabindex="0" aria-label="Plain-text result"></pre>
+    <div class="history">
+      <h3>Recent runs <span class="muted" style="font-weight:400;">(this browser only)</span></h3>
+      <div id="vs-history"><p class="history-empty">No runs yet. Your recent URLs stay in this browser only.</p></div>
+    </div>
   </div>
 
-  <div class="alert alert-warn" style="margin-top:1rem;">
-    <strong>Build ≠ Execute.</strong> The Build action prepares an executable skill and execution plan. The actual tutorial workflow runs in your selected coding harness (Codex, Claude Code, OpenCode, Cursor) only after you install the skill and authorize consequential operations. This playground does not execute code on your behalf and never stores coding-agent credentials.
-  </div>
+  <div class="alert alert-warn"><strong>Build ≠ Execute.</strong> The Build action prepares an executable skill and execution plan. The actual tutorial workflow runs in your selected coding harness (Codex, Claude Code, OpenCode, Cursor) only after you install the skill and authorize consequential operations. This playground does not execute code on your behalf and never stores coding-agent credentials.</div>
 
-  <div style="margin-top:1.5rem;">
-    <h3>What you get</h3>
-    <ul>
-      <li><strong>Explain</strong> — a clear technical walkthrough of the tutorial, with evidence labeled as spoken / visible / description / external-doc / inference.</li>
-      <li><strong>Create Skill</strong> — a downloadable Agent Skill folder (<code>SKILL.md</code> + <code>references/</code>) you can install into your coding agent.</li>
-      <li><strong>Build</strong> — the generated skill plus an execution plan and a copyable command for your coding harness.</li>
-    </ul>
+  <h2>What you get</h2>
+  <div class="grid grid-steps">
+    <div class="card"><span class="label">Explain</span><p>A clear technical walkthrough of the tutorial, with evidence labeled as spoken / visible / description / external-doc / inference.</p></div>
+    <div class="card"><span class="label">Create Skill</span><p>A downloadable Agent Skill folder (<code>SKILL.md</code> + <code>references/</code>) you can install into your coding agent.</p></div>
+    <div class="card"><span class="label">Build</span><p>The generated skill plus an execution plan and a copyable command for your coding harness.</p></div>
+    <div class="card"><span class="label">Verify</span><p>Run <code>video-skill validate</code> and real tests in-harness. Only observed passes count — never simulations.</p></div>
   </div>
-</div>
+  <div class="mt-2"><a href="docs/commands.html" class="btn btn-secondary btn-sm">Command reference</a> <a href="examples.html" class="btn btn-outline btn-sm">See example artifacts</a></div>
+</main>
 
+<footer>
+  <div class="foot-inner">
+    <div>Video Skill — one installable skill system, one CLI, one website, multiple coding agents. <span id="year"></span></div>
+    <nav aria-label="Footer"><a href="docs/security.html">Security</a><a href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">GitHub</a></nav>
+  </div>
+</footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="script.js"></script>
 </body>
 </html>

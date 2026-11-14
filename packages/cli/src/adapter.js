@@ -32,7 +32,21 @@ export async function extractVideo(inputUrl) {
     const subtitle = runAgentReach(['youtube', 'subtitle', url.href]);
     result.raw = { read: read.json ?? read.stdout ?? read.stderr, subtitle: subtitle.json ?? subtitle.stdout ?? subtitle.stderr };
     if (read.json?.ok) { const item = read.json.items?.[0] ?? read.json.data ?? read.json; result.source.title = item?.title ?? item?.name; result.source.author = item?.channel ?? item?.author ?? item?.uploader; result.source.publishedAt = item?.date ?? item?.published ?? item?.upload_date; result.source.duration = item?.duration; result.description = item?.description ?? item?.summary; result.ok = true; } else { result.warnings.push(`youtube read: ${read.json?.error?.message || read.stderr || 'failed'}`); }
-    if (subtitle.json?.ok) { const s = subtitle.json.items?.[0] ?? subtitle.json.data ?? subtitle.json; result.transcript = typeof s === 'string' ? s : (s?.text ?? s?.subtitle ?? s?.transcript ?? JSON.stringify(s, null, 2)); result.evidence.push({ claim: 'Transcript/subtitles retrieved via Agent Reach YouTube subtitle action.', sourceType: 'external-doc', confidence: 'medium', notes: 'May be auto-generated or partial; verify timestamps against video.' }); result.ok = true; } else { result.source.limitations.push('Subtitles/transcript unavailable via Agent Reach youtube subtitle.'); result.warnings.push(`youtube subtitle: ${subtitle.json?.error?.message || subtitle.stderr || 'failed'}`); }
+    const subtitleOk = subtitle.json?.ok;
+    const subtitleErr = subtitle.json?.error?.code || '';
+    const isRateLimited = subtitleErr === 'RATE_LIMITED' || (subtitle.stderr || '').includes('429') || (subtitle.stderr || '').includes('rate limit');
+    if (subtitleOk) { const s = subtitle.json.items?.[0] ?? subtitle.json.data ?? subtitle.json; result.transcript = typeof s === 'string' ? s : (s?.text ?? s?.subtitle ?? s?.transcript ?? JSON.stringify(s, null, 2)); result.evidence.push({ claim: 'Transcript/subtitles retrieved via Agent Reach YouTube subtitle action.', sourceType: 'external-doc', confidence: 'medium', notes: 'May be auto-generated or partial; verify timestamps against video.' }); result.ok = true; }
+    // Fallback: Whisper speech-to-text via transcribe (needs Groq/OpenAI key, no YouTube rate limit)
+    if (!subtitleOk && !isRateLimited) {
+      result.source.limitations.push('Subtitles/transcript unavailable via Agent Reach youtube subtitle.');
+      result.warnings.push(`youtube subtitle: ${subtitle.json?.error?.message || subtitle.stderr || 'failed'}`);
+    }
+    if (!result.transcript && (isRateLimited || !subtitleOk)) {
+      const transcribe = runAgentReach(['youtube', 'transcribe', url.href], 300000);
+      result.raw.transcribe = transcribe.json ?? transcribe.stdout ?? transcribe.stderr;
+      if (transcribe.json?.ok) { const s = transcribe.json.items?.[0] ?? transcribe.json.data ?? transcribe.json; result.transcript = typeof s === 'string' ? s : (s?.text ?? s?.subtitle ?? s?.transcript ?? JSON.stringify(s, null, 2)); result.evidence.push({ claim: 'Transcript retrieved via Agent Reach YouTube transcribe (Whisper speech-to-text).', sourceType: 'external-doc', confidence: 'medium', notes: 'Auto-generated from audio; verify against video. Requires a configured Groq or OpenAI key.' }); result.ok = true; }
+      else { const tErr = transcribe.json?.error?.code || ''; const tMsg = transcribe.json?.error?.message || transcribe.stderr || 'failed'; if (tErr === 'NEED_SETUP' || tMsg.includes('key') || tMsg.includes('Groq') || tMsg.includes('OpenAI')) { result.source.limitations.push('Whisper transcript unavailable: no Groq/OpenAI key configured. Run `agent-reach configure groq-key` in your terminal.'); } else { result.source.limitations.push('Whisper transcript unavailable via Agent Reach youtube transcribe.'); } result.warnings.push(`youtube transcribe: ${tMsg}`); }
+    }
     if (result.description) result.evidence.push({ claim: 'Video description retrieved.', sourceType: 'description', confidence: 'high' });
     return result;
   }

@@ -27,3 +27,6 @@ apps/*/node_modules/
 package-lock.json
 test-results/
 
+# Video Skill data directory (collections, generated skills)
+.video-skill/
+

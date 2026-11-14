@@ -13,31 +13,36 @@ const mime = {
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.svg': 'image/svg+xml',
+  '.txt': 'text/plain; charset=utf-8',
+  '.xml': 'application/xml; charset=utf-8',
 };
 
 const server = http.createServer((req, res) => {
-  let urlPath = req.url.split('?')[0];
+  let urlPath = (req.url || '/').split('?')[0];
+  try { urlPath = decodeURIComponent(urlPath); } catch {}
   if (urlPath === '/' || urlPath === '') urlPath = '/index.html';
-  let filePath = path.join(root, urlPath);
-  // prevent directory traversal
+  const filePath = path.join(root, urlPath);
   const realRoot = path.resolve(root);
   const realFile = path.resolve(filePath);
   if (!realFile.startsWith(realRoot + path.sep) && realFile !== realRoot) {
     res.writeHead(403); res.end('forbidden'); return;
   }
   fs.stat(realFile, (err, stat) => {
-    if (err || !stat.isFile()) {
-      // fallback to index.html for client-style routes (none here, but safe)
-      filePath = path.join(root, 'index.html');
-      fs.readFile(filePath, (err2, data) => {
-        if (err2) { res.writeHead(404); res.end('not found'); return; }
-        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); res.end(data);
-      });
-      return;
-    }
-    const ext = path.extname(realFile);
-    res.writeHead(200, { 'Content-Type': mime[ext] || 'application/octet-stream' });
-    fs.createReadStream(realFile).pipe(res);
+    let candidate = realFile;
+    if (!err && stat.isDirectory()) candidate = path.join(realFile, 'index.html');
+    fs.stat(candidate, (err2, stat2) => {
+      if (err2 || !stat2.isFile()) {
+        const notFound = path.join(realRoot, '404.html');
+        fs.readFile(notFound, (err3, data) => {
+          if (!err3) { res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' }); res.end(data); return; }
+          res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' }); res.end('not found');
+        });
+        return;
+      }
+      const ext = path.extname(candidate);
+      res.writeHead(200, { 'Content-Type': mime[ext] || 'application/octet-stream' });
+      fs.createReadStream(candidate).pipe(res);
+    });
   });
 });
 

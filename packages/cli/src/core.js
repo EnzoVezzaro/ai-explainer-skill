@@ -17,6 +17,9 @@ export function detectPlatform(url) {
   if (host === 'youtu.be' || host.endsWith('youtube.com')) return 'youtube';
   if (host.endsWith('bilibili.com') || host === 'b23.tv') return 'bilibili';
   if (host.endsWith('vimeo.com')) return 'vimeo';
+  if (host.endsWith('instagram.com')) return 'instagram';
+  if (host === 'twitter.com' || host === 'x.com' || host.endsWith('twitter.com') || host.endsWith('x.com')) return 'twitter';
+  if (host.endsWith('tiktok.com') || host === 'vm.tiktok.com') return 'tiktok';
   return 'web';
 }
 export function slugify(text) {

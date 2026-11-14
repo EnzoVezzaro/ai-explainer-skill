@@ -4,22 +4,35 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Documentation — Video Skill</title>
+<meta name="theme-color" content="#0f6bff">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f6bff'/%3E%3Cpath d='M13 10.5v11l9-5.5z' fill='white'/%3E%3C/svg%3E">
 <meta name="description" content="Installation, commands, supported platforms, security, troubleshooting, architecture and examples for Video Skill.">
 <link rel="stylesheet" href="../style.css">
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 
-<nav class="nav">
-  <div class="brand">Video <span class="accent">Skill</span></div>
+<div class="nav-wrap">
+<nav class="nav" aria-label="Primary">
+  <a class="brand" href="../index.html">Video <span class="accent">Skill</span></a>
   <div class="nav-links">
     <a href="../index.html">Home</a>
+    <a href="index.html">Documentation</a>
     <a href="../playground.html">Playground</a>
     <a href="../examples.html">Examples</a>
     <a href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">GitHub</a>
   </div>
+  <button class="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">☰</button>
 </nav>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="../index.html">Home</a>
+  <a href="index.html">Documentation</a>
+  <a href="../playground.html">Playground</a>
+  <a href="../examples.html">Examples</a>
+</div>
+</div>
 
-<div class="container section" style="display:flex; gap:1.5rem; flex-wrap:wrap;">
+<main id="main" class="container section" style="display:flex; gap:1.5rem; flex-wrap:wrap;">
   <aside class="docs-nav" style="min-width:220px; flex-shrink:0;">
     <span class="label">Docs</span>
     <a href="index.html">Overview</a>
@@ -67,14 +80,16 @@ npx video-skill install --provider claude-code --scope project
     <a href="installation.html" class="btn">Installation →</a>
     <a href="commands.html" class="btn btn-outline">CLI commands →</a>
   </div>
-</div>
+</main>
 
 <footer style="margin-top:3rem;">
   <div class="container" style="display:flex; flex-wrap:wrap; gap:1rem; align-items:center; justify-content:space-between;">
-    <div>Video Skill &mdash; one installable skill system, one CLI, one website, multiple coding agents.</div>
+    <div>Video Skill &mdash; one installable skill system, one CLI, one website, multiple coding agents. <span id="year"></span></div>
     <div><a href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">GitHub</a></div>
   </div>
 </footer>
 
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="../script.js"></script>
 </body>
 </html>
