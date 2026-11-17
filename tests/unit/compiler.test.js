@@ -58,6 +58,36 @@ describe('compileSkill', () => {
     assertStrict.ok(/^[a-z0-9-]+$/.test(compiled.name));
     assertStrict.ok(compiled.name.length <= 64);
   });
+
+  it('embeds extracted tools and how-to-use guidance in the skill', async () => {
+    await fs.rm(TMP, { recursive: true, force: true });
+    const extraction = {
+      ok: true,
+      source: { url: 'https://www.youtube.com/watch?v=abc', platform: 'youtube', title: '8 Free Websites', retrievedAt: '2026-01-01T00:00:00.000Z', retrievalTools: [], limitations: [] },
+      description: 'TIMESTAMPS:\n0:34 KokonutUI - liquid glass components',
+      tools: [{ timestamp: '0:34', name: 'KokonutUI', description: 'liquid glass components' }],
+      steps: [{ timestamp: '0:00', label: 'Introduction' }, { timestamp: '0:34', label: 'KokonutUI - liquid glass components' }],
+      links: ['https://kokonutui.com'],
+      warnings: [], evidence: [],
+    };
+    const compiled = await compileSkill(extraction, { outDir: TMP, name: 'free-web-tools' });
+    assertStrict.strictEqual(compiled.toolCount, 1);
+
+    const skillMd = await fs.readFile(path.join(compiled.path, 'SKILL.md'), 'utf8');
+    assertStrict.ok(skillMd.includes('KokonutUI'));
+    assertStrict.ok(skillMd.includes('## Tools covered (1)'));
+
+    const toolsMd = await fs.readFile(path.join(compiled.path, 'references', 'tools.md'), 'utf8');
+    assertStrict.ok(toolsMd.includes('### 1. KokonutUI'));
+    assertStrict.ok(toolsMd.includes('liquid glass components'));
+    assertStrict.ok(toolsMd.includes('How to use'));
+
+    const refs = await fs.readdir(path.join(compiled.path, 'references'));
+    assertStrict.ok(refs.includes('tools.md'));
+
+    const validation = await validateSkillDir(compiled.path);
+    assertStrict.ok(validation.ok, JSON.stringify(validation.issues));
+  });
 });
 
 describe('detectPlatform (compiler context)', () => {
