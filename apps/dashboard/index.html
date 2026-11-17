@@ -3,192 +3,107 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Video Skill Dashboard</title>
-<meta name="description" content="Manage video tutorial collections, generated Agent Skills, and MCP connections.">
+<title>Pond — Video to Skill</title>
+<meta name="description" content="Paste a video URL. Get a built Agent Skill with the steps and tools.">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div class="stage">
 
-<div class="dashboard">
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="logo">🎬</div>
-      <div class="name">Video <span class="accent">Skill</span></div>
-      <div class="version">Dashboard v0.1.0</div>
-    </div>
+  <!-- corner controls: tiny process blocks, kept active around the main word -->
+  <div class="corner tl"><span class="plus">+</span></div>
+  <div class="corner tr"><span class="micro">[ 0.001 ]</span></div>
+  <div class="corner bl"><span class="micro">CPU&nbsp; / &nbsp;01</span></div>
+  <div class="corner br"><span class="micro">[ · ]</span></div>
 
-    <nav class="nav">
-      <a href="#" class="nav-item active" data-section="collections">
-        <span class="icon">📁</span> Collections
-      </a>
-      <a href="#" class="nav-item" data-section="activity">
-        <span class="icon">⚡</span> Agent Activity
-      </a>
-      <a href="#" class="nav-item" data-section="mcp">
-        <span class="icon">🔌</span> MCP Connection
-      </a>
-      <a href="#" class="nav-item" data-section="api">
-        <span class="icon">📡</span> API Reference
-      </a>
-    </nav>
+  <!-- low-contrast botanical line drawing as texture -->
+  <svg class="botanical" viewBox="0 0 320 300" aria-hidden="true">
+    <g fill="none" stroke="currentColor" stroke-width="1.1">
+      <ellipse cx="108" cy="112" rx="56" ry="82" transform="rotate(-28 108 112)"/>
+      <ellipse cx="212" cy="112" rx="56" ry="82" transform="rotate(28 212 112)"/>
+      <ellipse cx="120" cy="206" rx="36" ry="50" transform="rotate(-16 120 206)"/>
+      <ellipse cx="200" cy="206" rx="36" ry="50" transform="rotate(16 200 206)"/>
+      <path d="M160 66 V242"/>
+      <path d="M160 62 Q146 34 122 28 M160 62 Q174 34 198 28"/>
+      <path d="M108 40 L150 170 M212 40 L170 170" stroke-dasharray="2 7"/>
+      <path d="M62 96 Q108 112 150 158 M258 96 Q212 112 170 158"/>
+      <circle cx="160" cy="58" r="6"/>
+    </g>
+  </svg>
 
-    <div class="server-status" id="server-status">
-      <div class="status-indicator"></div>
-      <span class="status-text">Server: <span id="status-text">checking…</span></span>
-    </div>
+  <main class="wrap">
+    <header class="hero">
+      <div class="kicker"><span>video intelligence</span><b>/</b><span>system launch</span></div>
+      <h1>
+        <span class="big-word">Video</span><span class="arrow">→</span><span class="big-word acid">Skill</span>
+      </h1>
+      <p class="lede">One URL in. A built Agent Skill out — the steps, the tools, and how to use them.</p>
 
-    <div class="new-collection">
-      <button class="btn btn-primary btn-block" id="btn-new-collection">+ New Collection</button>
-    </div>
-  </aside>
-
-  <!-- Main Content -->
-  <main class="main-content">
-    <header class="content-header">
-      <h1 id="page-title">Collections</h1>
-      <div class="header-actions"></div>
+      <div class="process-field" aria-hidden="true">
+        <span class="proc p1">URL IN</span>
+        <span class="proc p2">[ tools ]</span>
+        <span class="proc p3">EXTRACT</span>
+        <span class="proc p4">0.8437ms</span>
+        <span class="proc p5">COMPILE</span>
+        <span class="proc p6">READY</span>
+      </div>
     </header>
 
-    <!-- Collections Section -->
-    <section id="section-collections" class="content-section active">
-      <div class="toolbar">
-        <input type="text" id="search-collections" placeholder="Search collections…" class="search-input">
-        <button class="btn btn-secondary" onclick="app.refresh()">↻ Refresh</button>
-      </div>
-      <div id="collections-list" class="card-list">
-        <!-- Collections rendered here -->
-      </div>
-      <div id="empty-collections" class="empty-state" style="display:none;">
-        <p>No collections yet. Create your first collection to get started.</p>
-        <button class="btn btn-primary" id="btn-create-first">Create Collection</button>
-      </div>
+    <section class="builder">
+      <form id="build-form" autocomplete="off">
+        <label class="tag" for="url">&gt; PASTE VIDEO / CONTENT URL</label>
+        <div class="field">
+          <input id="url" type="url" inputmode="url"
+                 placeholder="https://www.youtube.com/watch?v=…"
+                 aria-label="Video or content URL" required>
+          <button id="build-btn" type="submit">BUILD SKILL <span class="key">[ ↵ ]</span></button>
+        </div>
+        <p class="hint">YouTube · Instagram · X / Twitter · TikTok · Bilibili · any public page</p>
+      </form>
     </section>
 
-    <!-- Collection Detail Section -->
-    <section id="section-collection-detail" class="content-section" style="display:none;">
-      <div class="toolbar">
-        <button class="btn btn-secondary" onclick="app.showCollections()">← Back to Collections</button>
-        <button class="btn btn-primary" onclick="app.addItemToCurrentCollection()">+ Add URL to Extract</button>
-      </div>
-      <h2 id="detail-collection-name"></h2>
-      <p id="detail-collection-desc"></p>
-      <div id="collection-items" class="card-list"></div>
-    </section>
+    <div id="status" class="status" hidden></div>
 
-    <!-- Item Detail Section -->
-    <section id="section-item-detail" class="content-section" style="display:none;">
-      <div class="toolbar">
-        <button class="btn btn-secondary" onclick="app.showCollectionDetail(app.currentCollectionId)">← Back</button>
-      </div>
-      <div class="item-detail-grid">
-        <div class="item-meta card">
-          <h3 id="item-title"></h3>
-          <div class="item-badges">
-            <span class="badge" id="item-platform"></span>
-            <span class="badge" id="item-status"></span>
-          </div>
-          <p class="item-url" id="item-url"></p>
-          <div class="item-timestamps">
-            <p><strong>Extracted:</strong> <span id="item-created"></span></p>
-            <p><strong>Updated:</strong> <span id="item-updated"></span></p>
+    <section id="result" class="result" hidden>
+      <div class="result-head">
+        <div class="result-title-block">
+          <span class="tag">// BUILT SKILL</span>
+          <h2 id="result-title"></h2>
+          <div class="meta">
+            <span id="result-platform" class="chip"></span>
+            <span id="result-counts" class="mono-sub"></span>
           </div>
         </div>
-
-        <div class="item-content card">
-          <h3>Extracted Content</h3>
-          <div id="item-extraction" class="extraction-preview"></div>
+        <div class="actions">
+          <button id="copy-btn" class="block mint" type="button">COPY</button>
+          <button id="download-btn" class="block brown" type="button">DOWNLOAD .ZIP</button>
         </div>
+      </div>
 
-        <div class="item-skill card">
-          <h3>Generated Agent Skill</h3>
-          <div id="item-skill-preview" class="skill-preview"></div>
-          <div class="skill-actions">
-            <button class="btn btn-primary" onclick="app.copySkillContent()">📋 Copy Skill</button>
-            <button class="btn btn-secondary" onclick="app.downloadSkill()">⬇ Download</button>
-            <button class="btn btn-outline" onclick="app.compileCurrentItem()">⚡ Compile Skill</button>
-            <button class="btn btn-outline" onclick="app.validateCurrentItem()">✓ Validate</button>
-          </div>
-        </div>
+      <div id="notice" class="notice" hidden></div>
+
+      <div class="result-body">
+        <nav id="tabs" class="tabs" role="tablist"></nav>
+        <pre id="file-view" class="file-view"></pre>
       </div>
     </section>
 
-    <!-- Activity Section -->
-    <section id="section-activity" class="content-section" style="display:none;">
-      <div class="toolbar">
-        <select id="activity-limit" class="select-input">
-          <option value="20">Last 20</option>
-          <option value="50">Last 50</option>
-          <option value="100">Last 100</option>
-        </select>
-        <button class="btn btn-secondary" onclick="app.refreshActivity()">↻ Refresh</button>
-      </div>
-      <div id="activity-list" class="activity-list"></div>
-    </section>
-
-    <!-- MCP Section -->
-    <section id="section-mcp" class="content-section" style="display:none;">
-      <div class="mcp-card card">
-        <h2>MCP Server Connection</h2>
-        <p>Connect your AI coding agent to Video Skill via the Model Context Protocol.</p>
-        <div class="mcp-endpoint">
-          <label>MCP Endpoint:</label>
-          <div class="endpoint-value" id="mcp-endpoint">http://localhost:3002/mcp</div>
-          <button class="btn btn-sm btn-secondary" onclick="app.copyText('http://localhost:3002/mcp')">Copy</button>
-        </div>
-        <div class="mcp-capabilities">
-          <h3>Available Resources</h3>
-          <ul>
-            <li><code>video-skill://collections/{id}</code> — Collection data</li>
-            <li><code>video-skill://collections/{id}/items/{itemId}</code> — Item details</li>
-            <li><code>video-skill://collections/{id}/items/{itemId}/skill</code> — Generated SKILL.md</li>
-          </ul>
-          <h3>Available Tools</h3>
-          <ul>
-            <li><strong>extract</strong> — Extract content from a public URL</li>
-            <li><strong>compile</strong> — Compile extraction into Agent Skill</li>
-            <li><strong>validate</strong> — Validate a generated skill</li>
-            <li><strong>list_collections</strong> — List all collections</li>
-          </ul>
-        </div>
-        <div class="mcp-example">
-          <h3>Example: Claude Code MCP Config</h3>
-          <pre><code>{
-  "mcpServers": {
-    "video-skill": {
-      "command": "npx",
-      "args": ["video-skill-mcp", "--endpoint", "http://localhost:3002/mcp"]
-    }
-  }
-}</code></pre>
-        </div>
-      </div>
-    </section>
-
-    <!-- API Section -->
-    <section id="section-api" class="content-section" style="display:none;">
-      <div class="api-card card">
-        <h2>REST API Reference</h2>
-        <p>Base URL: <span id="api-base">http://localhost:3002/api</span></p>
-        <table class="api-table">
-          <thead><tr><th>Method</th><th>Endpoint</th><th>Description</th></tr></thead>
-          <tbody>
-            <tr><td>GET</td><td>/api/collections</td><td>List all collections</td></tr>
-            <tr><td>POST</td><td>/api/collections</td><td>Create a collection</td></tr>
-            <tr><td>GET</td><td>/api/collections/:id</td><td>Get a collection with items</td></tr>
-            <tr><td>POST</td><td>/api/extract</td><td>Extract content from a URL</td></tr>
-            <tr><td>POST</td><td>/api/collections/:id/items/:itemId/compile</td><td>Compile item into Agent Skill</td></tr>
-            <tr><td>POST</td><td>/api/validate</td><td>Validate a generated skill</td></tr>
-            <tr><td>GET</td><td>/api/actions</td><td>Agent activity feed</td></tr>
-            <tr><td>POST</td><td>/mcp</td><td>MCP JSON-RPC endpoint</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
+    <footer class="foot">
+      <span>Built from the video's public description + transcript.</span>
+      <span>External content is untrusted — review before running.</span>
+    </footer>
   </main>
-</div>
 
-<div id="toast"></div>
+  <!-- full-bleed dark-brown cut during processing -->
+  <div id="darkcut" class="darkcut" hidden>
+    <div class="dc-inner">
+      <span class="dc-label" id="dc-label">BOOTING</span>
+      <div class="dc-blocks"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <span class="dc-sub">garden&nbsp; → &nbsp;blossoms&nbsp; → &nbsp;bees&nbsp; → &nbsp;system</span>
+    </div>
+  </div>
+
+</div>
 <script src="app.js"></script>
 </body>
 </html>

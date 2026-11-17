@@ -9,6 +9,8 @@ import { parsePublicUrl, detectPlatform } from '../../core/src/index.js';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
+import { randomUUID } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { createServer } from 'node:http';
 
@@ -366,13 +368,78 @@ export function createApp() {
     res.json(response);
   });
 
+  // One-shot: URL -> built skill (extract + compile + validate + zip). Stateless, no collection needed.
+  const SKILL_FILES = ['SKILL.md', 'references/tools.md', 'references/walkthrough.md', 'references/source.md', 'references/dependencies.md'];
+  const buildRoot = path.join(os.tmpdir(), 'video-skill-builds');
+
+  app.post('/api/build', async (req, res) => {
+    const { url, name } = req.body || {};
+    if (!url || typeof url !== 'string') return res.status(400).json({ error: 'A video/content URL is required.' });
+    const parsed = parsePublicUrl(url);
+    if (!parsed.ok) return res.status(400).json({ error: parsed.error?.message || 'Invalid URL.' });
+
+    try {
+      const extraction = await extractVideo(url);
+      if (!extraction.description && !extraction.transcript) {
+        return res.status(422).json({
+          error: 'Could not extract usable content from this URL.',
+          warnings: extraction.warnings || [],
+          limitations: extraction.source?.limitations || [],
+        });
+      }
+
+      const buildId = randomUUID().slice(0, 8);
+      const outDir = path.join(buildRoot, buildId);
+      await fs.mkdir(outDir, { recursive: true });
+      const compiled = await compileSkill(extraction, { outDir, name: typeof name === 'string' && name ? name : undefined });
+      const validation = await validateSkillDir(compiled.path);
+
+      const files = {};
+      for (const rel of SKILL_FILES) {
+        try { files[rel] = await fs.readFile(path.join(compiled.path, rel), 'utf8'); } catch { files[rel] = ''; }
+      }
+
+      const zipPath = path.join(outDir, `${compiled.name}.zip`);
+      spawnSync('zip', ['-r', '-q', zipPath, compiled.name], { cwd: outDir });
+
+      res.json({
+        ok: true,
+        buildId,
+        name: compiled.name,
+        title: extraction.source?.title || '',
+        platform: extraction.source?.platform || 'web',
+        author: extraction.source?.author || '',
+        tools: extraction.tools || [],
+        steps: extraction.steps || [],
+        links: extraction.links || [],
+        warnings: extraction.warnings || [],
+        limitations: extraction.source?.limitations || [],
+        validation,
+        files,
+        zipUrl: `/api/build/${buildId}/download`,
+      });
+    } catch (e) {
+      res.status(500).json({ error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
+  app.get('/api/build/:buildId/download', (req, res) => {
+    if (!/^[a-f0-9]{8}$/.test(req.params.buildId)) return res.status(400).json({ error: 'Invalid build id.' });
+    const dir = path.join(buildRoot, req.params.buildId);
+    fs.readdir(dir).then(entries => {
+      const zip = entries.find(f => f.endsWith('.zip'));
+      if (!zip) return res.status(404).json({ error: 'Build not found.' });
+      res.download(path.join(dir, zip), zip);
+    }).catch(() => res.status(404).json({ error: 'Build not found.' }));
+  });
+
   // Serve dashboard UI
   const dashboardDir = path.join(REPO_ROOT, 'apps/dashboard');
   app.use(express.static(dashboardDir));
   // SPA fallback: return index.html for any non-API, non-static route
   app.use((req, res, next) => {
     if (req.path.startsWith('/api') || req.path.startsWith('/mcp')) return next();
-    res.sendFile(path.join(dashboardDir, 'index.html')).catch(() => next());
+    res.sendFile(path.join(dashboardDir, 'index.html'), (err) => { if (err) next(); });
   });
 
   return { app, cm, mcp };
