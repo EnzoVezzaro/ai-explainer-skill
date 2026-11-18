@@ -1,6 +1,6 @@
 {
   "name": "video-skill",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Turn video tutorials into reusable, executable Agent Skills for existing AI coding agents.",
   "license": "MIT",
   "author": "Enzo Vezzaro",

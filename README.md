@@ -4,6 +4,8 @@ Turn a public tutorial URL into a **portable Agent Skill** that teaches an exist
 
 **This is not** a new AI coding agent, desktop app, or orchestration platform. It augments the coding harness you already use (Codex, Claude Code, OpenCode, Cursor where compatible).
 
+**Website:** https://enzovezzaro.github.io/ai-explainer-skill/ — the landing page, docs, examples and playground are published with GitHub Pages on every release.
+
 ## Architecture
 
 ```text
