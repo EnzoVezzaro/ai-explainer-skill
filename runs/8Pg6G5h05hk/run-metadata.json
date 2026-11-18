@@ -1,0 +1,64 @@
+{
+  "sourceUrl": "https://www.youtube.com/watch?v=8Pg6G5h05hk",
+  "title": "Anthropic Just Released the New Rules of Claude Code",
+  "workflowId": "bd765b11",
+  "platform": "youtube",
+  "author": "Nate Herk | AI Automation",
+  "retrievedAt": "2026-11-18T13:01:00.213Z",
+  "steps": [
+    {
+      "timestamp": "0:00",
+      "label": "Intro"
+    },
+    {
+      "timestamp": "0:26",
+      "label": "Steering: Now the Model"
+    },
+    {
+      "timestamp": "1:40",
+      "label": "Approving: Now Auto Mode"
+    },
+    {
+      "timestamp": "3:04",
+      "label": "Saying No: Deny Rules and the Sandbox"
+    },
+    {
+      "timestamp": "5:19",
+      "label": "Checking It's Done: Tests, Hooks, and CI"
+    },
+    {
+      "timestamp": "7:52",
+      "label": "Starting Sessions: Claude Code Projects"
+    },
+    {
+      "timestamp": "8:54",
+      "label": "Recap"
+    }
+  ],
+  "tools": [],
+  "links": [
+    "https://app.aiautomationsociety.ai/optin/ai-os/?utm_source=youtube&utm_medium=organic&utm_content=claude-code-best-practices&sl=yt_claude-code-best-practices",
+    "https://www.skool.com/ai-automation-society-plus/about?el=claude-code-best-practices&hcategory=youtube-videos&utm_campaign=plus-group",
+    "https://www.skool.com/ai-automation-society/about?el=claude-code-best-practices&hcategory=youtube-videos&utm_campaign=free-group",
+    "https://get.glaido.com/nate",
+    "https://www.hostinger.com/vps/claude-code-hosting",
+    "https://www.youtube.com/watch?v=vlfCjWuv4es",
+    "https://www.linkedin.com/in/nateherkelman/",
+    "https://x.com/nateherk",
+    "https://www.instagram.com/nateherk/"
+  ],
+  "warnings": [
+    "youtube subtitle: yt-dlp exited 1: ERROR: Unable to download video subtitles for 'zh-Hans': HTTP Error 429: Too Many Requests"
+  ],
+  "limitations": [
+    "Transcript unavailable via Agent Reach transcribe: Platform reported a rate limit"
+  ],
+  "validation": {
+    "ok": true,
+    "issues": [],
+    "frontmatter": {
+      "name": "anthropic-just-released-the-new-rules-of-claude-code",
+      "description": "Reproduce the workflow taught in \\\"Anthropic Just Released the New Rules of Claude Code\\\" (https://www.youtube.com/watch?v=8Pg6G5h05hk). Use when the user asks to follow or adapt this tutorial."
+    }
+  }
+}
