@@ -172,7 +172,7 @@
   async function run(e) {
     e.preventDefault();
     const url = urlInput.value.trim();
-    if (!url) { status('Paste a source URL to give the agent a video to work from.'); urlInput.focus(); return; }
+    if (!url) { status('The agent needs a source — paste a video or content URL to start the workflow.'); urlInput.focus(); return; }
 
     clearStatus();
     resultEl.hidden = true;
