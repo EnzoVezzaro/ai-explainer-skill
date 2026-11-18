@@ -14,10 +14,10 @@ packages/*/node_modules/
 apps/*/node_modules/
 
 # Harness skill install targets created by `video-skill install` in the repo
-.agents/skills/video-skill
-.claude/skills/video-skill
-.opencode/skills/video-skill
-.cursor/skills/video-skill
+.agents/skills/video-skill*
+.claude/skills/video-skill*
+.opencode/skills/video-skill*
+.cursor/skills/video-skill*
 
 # npm pack tarballs
 *.tgz

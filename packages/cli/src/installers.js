@@ -30,7 +30,7 @@ export async function installCoreSkill(options) {
   if (!provider) throw new Error('No supported providers found.');
   const scope = options.scope || 'project';
   const base = scope === 'user' ? provider.userPath : provider.projectPath;
-  const target = path.join(base, 'video-skill');
+  const target = path.join(base, options.skillName || 'video-skill');
   const existed = await exists(target);
   if (existed && !options.force) { return { ok: false, code: 'TARGET_EXISTS', message: `Target already exists: ${target}. Use --force to replace files managed by this installer.`, target, provider: provider.id, scope }; }
   await copyDir(options.sourceDir, target);
@@ -38,6 +38,62 @@ export async function installCoreSkill(options) {
   await fs.writeFile(path.join(target, MANIFEST), JSON.stringify(manifest, null, 2) + '\n', 'utf8');
   return { ok: true, provider: provider.id, scope, target, manifest };
 }
+/**
+ * Install the full skill suite into every detected coding harness, at both
+ * user scope (available in any project) and project scope (this workspace).
+ * Existing installer-managed copies are left untouched unless force is set.
+ */
+export async function installSkillSuite(options = {}) {
+  const providers = await detectProviders();
+  const detected = providers.filter(p => p.detected);
+  // Discover every skill folder under skills/ — the full portable suite.
+  const skillsDir = options.skillsDir;
+  const skillNames = [];
+  if (skillsDir) {
+    try {
+      for (const entry of await fs.readdir(skillsDir, { withFileTypes: true })) {
+        if (!entry.isDirectory()) continue;
+        if (!(await exists(path.join(skillsDir, entry.name, 'SKILL.md')))) continue;
+        skillNames.push(entry.name);
+      }
+    } catch {}
+  }
+  if (!skillNames.length) skillNames.push('video-skill');
+
+  const results = [];
+  for (const provider of detected) {
+    for (const skillName of skillNames) {
+      for (const scope of ['user', 'project']) {
+        try {
+          const res = await installCoreSkill({
+            sourceDir: path.join(skillsDir || '', skillName),
+            skillName,
+            providerId: provider.id,
+            scope,
+            force: Boolean(options.force),
+          });
+          results.push({ provider: provider.id, skill: skillName, scope, ok: res.ok, code: res.code, target: res.target });
+        } catch (e) {
+          results.push({ provider: provider.id, skill: skillName, scope, ok: false, error: e.message });
+        }
+      }
+    }
+  }
+  const installed = results.filter(r => r.ok);
+  const skipped = results.filter(r => r.code === 'TARGET_EXISTS');
+  const errors = results.filter(r => !r.ok && !r.code);
+  return {
+    // "OK" means the suite is present on every detected agent, whether just
+    // installed or already there. Only real errors make the call fail.
+    ok: errors.length === 0 && results.length > 0,
+    detected: detected.map(p => p.id),
+    skills: skillNames,
+    results,
+    installedCount: installed.length,
+    skippedCount: skipped.length,
+  };
+}
+
 export async function uninstallCoreSkill(options = {}) {
   const providers = await detectProviders();
   const targets = [];

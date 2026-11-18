@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import { CollectionManager } from '../../collection-manager/src/index.js';
+import { installSkillSuite } from '../../cli/src/installers.js';
 import { WorkflowEngine } from './workflow.js';
 import { extractVideo } from '../../agent-reach-adapter/src/index.js';
 import { compileSkill, validateSkillDir } from '../../skill-compiler/src/index.js';
@@ -485,6 +486,19 @@ export function createApp() {
       if (!zip) return res.status(404).json({ error: 'Build not found.' });
       res.download(path.join(dir, zip), zip);
     }).catch(() => res.status(404).json({ error: 'Build not found.' }));
+  });
+
+  // Install the full skill suite into every detected coding harness.
+  app.post('/api/install', async (req, res) => {
+    try {
+      const result = await installSkillSuite({
+        skillsDir: path.join(REPO_ROOT, 'skills'),
+        force: Boolean(req.body?.force),
+      });
+      res.json(result);
+    } catch (e) {
+      res.status(500).json({ ok: false, error: e.message || String(e) });
+    }
   });
 
   // Workflow runs (MCP-driven). The site connects to the MCP; these are a thin

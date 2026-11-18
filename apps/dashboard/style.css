@@ -66,7 +66,8 @@ body { background: var(--paper); color: var(--ink); font: 15px/1.6 -apple-system
 .agent-cmd { display: block; font: 12px/1 var(--mono); background: var(--purple); border: 1px solid var(--ink); padding: 10px; margin: 8px 0 0; }
 .hint { margin: 10px 0 0; font: 11px/1.5 var(--mono); color: rgba(50,23,13,.55); }
 .block.acid { background: var(--acid); }
-#sample-btn { margin-top: 14px; width: 100%; }
+#install-btn { margin-top: 14px; width: 100%; }
+.install-result { margin-top: 10px; font: 11px/1.5 var(--mono); background: var(--mint); border: 1px solid var(--ink); padding: 10px; }
 
 .waiting { margin: 24px 0 0; padding: 18px 20px; border: 1px solid var(--ink); background: var(--mint); font: 12px/1 var(--mono); letter-spacing: .04em; }
 .waiting-mark { margin-right: 8px; }

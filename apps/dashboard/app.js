@@ -21,8 +21,6 @@
     'references/source.md': 'SOURCE',
     'references/dependencies.md': 'DEPS',
   };
-  const SAMPLE_URL = 'https://www.youtube.com/watch?v=9NubqbSNbjg';
-
   let rpcId = 0;
   let watchTimer = null;
   let following = null;       // workflow id we are rendering
@@ -237,26 +235,33 @@
     if (url) window.location.href = url;
   }
 
-  async function runSample() {
-    const btn = $('sample-btn');
-    btn.disabled = true;
+  async function installSuite() {
+    const btn = $('install-btn');
+    const box = $('install-result');
     const old = btn.textContent;
-    btn.textContent = 'STARTING…';
-    clearStatus();
+    btn.disabled = true;
+    btn.textContent = 'INSTALLING…';
+    box.hidden = true;
     try {
-      const run = await tool('run_workflow', { url: SAMPLE_URL });
-      seen.set(run.id, { status: run.status, updatedAt: run.updatedAt });
-      following = run.id;
-      renderedMessages = 0;
-      threadEl.innerHTML = '';
-      resultEl.hidden = true;
-      waiting.hidden = true;
-      if (!watchTimer) startWatching();
+      const res = await fetch('/api/install', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{}',
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.error || 'Install failed');
+      const installed = data.results.filter(r => r.ok);
+      const already = data.results.filter(r => r.code === 'TARGET_EXISTS');
+      box.textContent = `Installed ${installed.length} · already present ${already.length} · agents: ${data.detected.join(', ')} · skills: ${data.skills.join(', ')}`;
+      box.hidden = false;
+      btn.textContent = 'INSTALLED ✓';
+      setTimeout(() => { btn.textContent = old; }, 1800);
     } catch (e) {
-      status(e.message || 'Could not start the sample workflow.');
+      box.textContent = `Install failed: ${e.message}`;
+      box.hidden = false;
+      btn.textContent = old;
     } finally {
       btn.disabled = false;
-      btn.textContent = old;
     }
   }
 
@@ -264,6 +269,6 @@
   $('copy-config').addEventListener('click', (e) => copyText($('mcp-config').textContent, e.currentTarget));
   $('copy-btn').addEventListener('click', copySkill);
   $('download-btn').addEventListener('click', download);
-  $('sample-btn').addEventListener('click', runSample);
+  $('install-btn').addEventListener('click', installSuite);
   connect();
 })();
