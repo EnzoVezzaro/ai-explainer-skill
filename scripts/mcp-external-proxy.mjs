@@ -13,6 +13,9 @@ import path from 'node:path';
 const PORT = Number(process.env.MCP_PROXY_PORT || 3003);
 const BACKEND = process.env.MCP_BACKEND || 'http://127.0.0.1:3002/mcp';
 const TOKEN = process.env.MCP_TUNNEL_TOKEN || crypto.randomBytes(24).toString('hex');
+// ChatGPT's custom-MCP UI offers "No authentication" and sends no Bearer header.
+// Keep auth opt-in so the tunnel works with that UI; enable with MCP_REQUIRE_AUTH=1.
+const REQUIRE_AUTH = process.env.MCP_REQUIRE_AUTH === '1';
 
 const tokenPath = path.join(os.homedir(), '.video-skill', 'mcp-tunnel-token');
 await fs.mkdir(path.dirname(tokenPath), { recursive: true });
@@ -44,18 +47,21 @@ const server = http.createServer(async (req, res) => {
     return json(res, 404, { error: 'Not found' });
   }
 
-  // Bearer auth on the only externally reachable endpoint.
-  const auth = req.headers.authorization || '';
-  const given = auth.startsWith('Bearer ') ? auth.slice(7).trim() : '';
-  const expected = Buffer.from(given);
-  const actual = Buffer.from(TOKEN);
-  const ok = expected.length === actual.length && crypto.timingSafeEqual(expected, actual);
-  if (!ok) {
-    res.writeHead(401, {
-      'Content-Type': 'application/json',
-      'WWW-Authenticate': 'Bearer',
-    });
-    return res.end(JSON.stringify({ error: 'Unauthorized' }));
+  // Bearer auth is optional: ChatGPT's custom-MCP UI uses "No authentication"
+  // and sends no header. When explicitly enabled, use constant-time comparison.
+  if (REQUIRE_AUTH) {
+    const auth = req.headers.authorization || '';
+    const given = auth.startsWith('Bearer ') ? auth.slice(7).trim() : '';
+    const expected = Buffer.from(given);
+    const actual = Buffer.from(TOKEN);
+    const ok = expected.length === actual.length && crypto.timingSafeEqual(expected, actual);
+    if (!ok) {
+      res.writeHead(401, {
+        'Content-Type': 'application/json',
+        'WWW-Authenticate': 'Bearer',
+      });
+      return res.end(JSON.stringify({ error: 'Unauthorized' }));
+    }
   }
 
   if (req.method === 'GET') {
@@ -108,7 +114,8 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, '127.0.0.1', () => {
-  console.log(`Authenticated MCP proxy on http://127.0.0.1:${PORT}/mcp`);
-  console.log(`Token saved to ${tokenPath}`);
+  console.log(`MCP proxy on http://127.0.0.1:${PORT}/mcp`);
+  console.log(`Auth: ${REQUIRE_AUTH ? 'REQUIRED (Bearer)' : 'optional (off) — works with ChatGPT "No authentication"'}`);
+  if (REQUIRE_AUTH) console.log(`Token saved to ${tokenPath}`);
   console.log(`Forwarding to ${BACKEND}`);
 });

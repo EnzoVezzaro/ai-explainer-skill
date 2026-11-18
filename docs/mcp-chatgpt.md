@@ -23,9 +23,12 @@ https://<tunnel>.trycloudflare.com/mcp
 ## Estado actual
 
 - Endpoint público: `https://begin-cole-size-caring.trycloudflare.com/mcp`
-- Autenticación: **Bearer token**
-- Token: ver `~/.video-skill/mcp-tunnel-token` (chmod 600)
-- Sin token → `401 Unauthorized`. Con token → `200 OK`.
+- Autenticación: **opcional (desactivada por defecto)** — ChatGPT's custom-MCP UI
+  usa "No authentication" y no envía cabecera Bearer. El proxy responde `200 OK`
+  sin token, que es lo que necesita el flujo de conexión de ChatGPT.
+- Para exigir Bearer: arranca el proxy con `MCP_REQUIRE_AUTH=1` (entonces sin
+  token → `401`, con token → `200`). El token se guarda en
+  `~/.video-skill/mcp-tunnel-token` (chmod 600).
 
 > La URL de quick tunnel es efímera: cambia cada vez que se reinicia
 > `cloudflared`. Para una URL estable, usa un túnel nombrado con cuenta de
@@ -36,8 +39,9 @@ https://<tunnel>.trycloudflare.com/mcp
 Settings → Plugins / Connectors → Create app → MCP:
 
 - **URL**: `https://begin-cole-size-caring.trycloudflare.com/mcp`
-- **Authentication**: Bearer / API key → pega el token de
-  `~/.video-skill/mcp-tunnel-token`
+- **Authentication**: **No authentication** (selecciona esta opción en la UI de
+  ChatGPT; el proxy lo permite). Si arrancaste el proxy con `MCP_REQUIRE_AUTH=1`,
+  elige Bearer/API key y pega el token de `~/.video-skill/mcp-tunnel-token`.
 
 ## Herramientas expuestas
 
@@ -73,7 +77,11 @@ MCP_TUNNEL_TOKEN=<tu-token> node scripts/mcp-external-proxy.mjs
 
 ## Seguridad
 
-- El túnel expone **solo** el proxy autenticado; el MCP local sigue en loopback.
-- El proxy usa `timingSafeEqual` para el token y responde `401` sin él.
+- El túnel expone **solo** el proxy; el MCP local sigue en loopback.
+- Por defecto **no hay autenticación** para que ChatGPT pueda conectar ("No
+  authentication"). Eso significa que cualquiera con la URLefímera puede llamar
+  a las herramientas. Úsalo solo en desarrollo y cierra el túnel cuando termines.
+- Para exigir Bearer: `MCP_REQUIRE_AUTH=1` (usa `timingSafeEqual` y responde
+  `401` sin token) y elige "Bearer" en ChatGPT.
 - No pongas secretos en el repositorio; el token vive fuera del repo.
 - Quick tunnels no tienen garantía de uptime; úsalos solo para desarrollo/prueba.

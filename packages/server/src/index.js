@@ -41,7 +41,7 @@ class MCPServer {
       switch (method) {
         case 'initialize':
           result = {
-            protocolVersion: '2024-11-05',
+            protocolVersion: params?.protocolVersion || '2024-11-05',
             capabilities: this.capabilities,
             serverInfo: { name: 'video-skill', version: '0.1.0' },
           };
