@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import { CollectionManager } from '../../collection-manager/src/index.js';
+import { WorkflowEngine } from './workflow.js';
 import { extractVideo } from '../../agent-reach-adapter/src/index.js';
 import { compileSkill, validateSkillDir } from '../../skill-compiler/src/index.js';
 import { parsePublicUrl, detectPlatform } from '../../core/src/index.js';
@@ -23,8 +24,9 @@ const REPO_ROOT = path.resolve(__dirname, '../../..');
  * Exposes: resources (collections, skills), tools (extract, compile, validate, install)
  */
 class MCPServer {
-  constructor(collectionManager) {
+  constructor(collectionManager, workflowEngine) {
     this.cm = collectionManager;
+    this.workflows = workflowEngine;
     this.capabilities = {
       resources: { listChanged: true },
       tools: { listChanged: true },
@@ -72,6 +74,14 @@ class MCPServer {
   async listResources() {
     const collections = await this.cm.listCollections();
     const resources = [];
+    for (const wf of await this.workflows.list()) {
+      resources.push({
+        uri: `video-skill://workflows/${wf.id}`,
+        name: `Workflow ${wf.id}`,
+        description: `${wf.status} · ${wf.url}`,
+        mimeType: 'application/json',
+      });
+    }
     for (const col of collections) {
       resources.push({
         uri: `video-skill://collections/${col.id}`,
@@ -100,6 +110,11 @@ class MCPServer {
   }
 
   async readResource(uri) {
+    const wf = uri.match(/^video-skill:\/\/workflows\/([^\/]+)$/);
+    if (wf) {
+      const run = await this.workflows.get(wf[1]);
+      return { contents: [{ uri, mimeType: 'application/json', text: JSON.stringify(run, null, 2) }] };
+    }
     const match = uri.match(/^video-skill:\/\/collections\/([^\/]+)(\/items\/([^\/]+))?(\/skill)?$/);
     if (!match) throw { code: -32602, message: `Invalid resource URI: ${uri}` };
     const [, collectionId, , itemId, isSkill] = match;
@@ -160,6 +175,32 @@ class MCPServer {
       {
         name: 'list_collections',
         description: 'List all collections',
+        inputSchema: { type: 'object', properties: {} },
+      },
+      {
+        name: 'run_workflow',
+        description: 'Start the full workflow: extract a URL, map its steps and tools, compile and validate an Agent Skill. Returns a workflow id to watch with workflow_status.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            url: { type: 'string', description: 'Public video/content URL (optional if the agent already has a source)' },
+            name: { type: 'string', description: 'Optional skill name' },
+          },
+          required: ['url'],
+        },
+      },
+      {
+        name: 'workflow_status',
+        description: 'Get the live status, agent thread and result of a workflow run.',
+        inputSchema: {
+          type: 'object',
+          properties: { id: { type: 'string', description: 'Workflow id from run_workflow' } },
+          required: ['id'],
+        },
+      },
+      {
+        name: 'list_workflows',
+        description: 'List workflow runs and their status',
         inputSchema: { type: 'object', properties: {} },
       },
     ];
@@ -223,6 +264,18 @@ class MCPServer {
         const collections = await this.cm.listCollections();
         return { content: [{ type: 'text', text: JSON.stringify(collections, null, 2) }] };
       }
+      case 'run_workflow': {
+        const run = await this.workflows.start({ url: args.url, name: args.name });
+        return { content: [{ type: 'text', text: JSON.stringify(run, null, 2) }] };
+      }
+      case 'workflow_status': {
+        const run = await this.workflows.get(args.id);
+        return { content: [{ type: 'text', text: JSON.stringify(run, null, 2) }] };
+      }
+      case 'list_workflows': {
+        const runs = await this.workflows.list();
+        return { content: [{ type: 'text', text: JSON.stringify(runs, null, 2) }] };
+      }
       default:
         throw { code: -32602, message: `Unknown tool: ${name}` };
     }
@@ -238,7 +291,8 @@ export function createApp() {
 
   const dataDir = process.env.VIDEO_SKILL_DATA_DIR || path.join(os.homedir(), '.video-skill');
   const cm = new CollectionManager({ dataDir });
-  const mcp = new MCPServer(cm);
+  const workflows = new WorkflowEngine({ dataDir });
+  const mcp = new MCPServer(cm, workflows);
 
   // Health
   app.get('/health', (req, res) => res.json({ ok: true, service: 'video-skill-dashboard' }));
@@ -433,6 +487,25 @@ export function createApp() {
     }).catch(() => res.status(404).json({ error: 'Build not found.' }));
   });
 
+  // Workflow runs (MCP-driven). The site connects to the MCP; these are a thin
+  // HTTP mirror for status polling and the downloadable result.
+  app.post('/api/workflows', async (req, res) => {
+    try {
+      const run = await workflows.start({ url: req.body?.url, name: req.body?.name });
+      return res.json(run);
+    } catch (e) { return res.status(400).json({ error: e.message || String(e) }); }
+  });
+  app.get('/api/workflows', async (_req, res) => res.json(await workflows.list()));
+  app.get('/api/workflows/:id', async (req, res) => {
+    try { return res.json(await workflows.get(req.params.id)); }
+    catch { return res.status(404).json({ error: 'Unknown workflow' }); }
+  });
+  app.get('/api/workflows/:id/download', (req, res) => {
+    const zip = workflows.zipPath(req.params.id);
+    if (!zip) return res.status(404).json({ error: 'No built skill for this workflow yet.' });
+    res.download(zip, path.basename(zip));
+  });
+
   // Serve dashboard UI
   const dashboardDir = path.join(REPO_ROOT, 'apps/dashboard');
   app.use(express.static(dashboardDir));
@@ -442,11 +515,12 @@ export function createApp() {
     res.sendFile(path.join(dashboardDir, 'index.html'), (err) => { if (err) next(); });
   });
 
-  return { app, cm, mcp };
+  return { app, cm, mcp, workflows };
 }
 
 export async function start(port = 3002) {
-  const { app } = createApp();
+  const { app, workflows } = createApp();
+  await workflows.init();
   const server = createServer(app);
   await new Promise((resolve) => server.listen(port, resolve));
   console.log(`Video Skill Dashboard server running at http://localhost:${port}`);

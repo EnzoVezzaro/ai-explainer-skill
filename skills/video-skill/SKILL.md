@@ -31,6 +31,17 @@ Turn an instructional video into structured evidence, a clear walkthrough, andâ€
 
 If the request is ambiguous, start with **Learn** and present a concise plan.
 
+## MCP workflow (preferred when the dashboard is running)
+
+When the video-skill MCP is connected (`http://localhost:3002/mcp`), run the whole task as a tracked workflow instead of doing steps ad hoc. This mirrors the web console and lets the user watch the agent thread and keep the result.
+
+1. Call `run_workflow` with the source URL (and optional skill name). It returns a workflow `id` immediately.
+2. Call `workflow_status` with that id as often as needed. It returns ordered steps, an agent-style thread, and the built skill when done.
+3. The result includes `SKILL.md` plus `references/tools.md` (each tool and how to use it), `references/walkthrough.md` (ordered steps from the video timeline), `references/source.md` and `references/dependencies.md`. A downloadable zip URL is included.
+4. Read `video-skill://workflows/{id}` as a resource for the same snapshot.
+
+The MCP also exposes the individual `extract`, `compile`, and `validate` tools if the user wants a manual, step-by-step run. The dashboard at `http://localhost:3002/` is a client of this same MCP â€” it starts a run, streams the thread, and renders the finished skill. Never fabricate a workflow result; report the real status from `workflow_status`.
+
 ## Learn
 
 Goal: recover the tutorial's instructional content as structured evidence.

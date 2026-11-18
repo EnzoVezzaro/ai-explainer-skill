@@ -1,103 +1,128 @@
 (() => {
   const $ = (id) => document.getElementById(id);
-  const form = $('build-form');
+  const form = $('run-form');
   const urlInput = $('url');
-  const buildBtn = $('build-btn');
+  const runBtn = $('run-btn');
   const statusEl = $('status');
+  const connEl = $('conn');
+  const connText = $('conn-text');
+  const cornerStatus = $('corner-status');
+  const toolsList = $('tools-list');
+  const threadSection = $('thread-section');
+  const threadEl = $('thread');
+  const threadMeta = $('thread-meta');
   const resultEl = $('result');
   const tabsEl = $('tabs');
   const viewEl = $('file-view');
-  const darkcut = $('darkcut');
-  const dcLabel = $('dc-label');
 
   const TAB_LABELS = {
     'SKILL.md': 'SKILL.MD',
-    'references/walkthrough.md': 'STEPS',
     'references/tools.md': 'TOOLS',
+    'references/walkthrough.md': 'STEPS',
     'references/source.md': 'SOURCE',
     'references/dependencies.md': 'DEPS',
   };
-  const PHASES = ['BOOTING', 'EXTRACTING', 'COMPILING', 'VALIDATING', 'PACKAGING'];
 
-  let current = null;
+  let rpcId = 0;
+  let pollTimer = null;
+  let current = null;      // latest workflow snapshot
   let activeFile = 'SKILL.md';
-  let phaseTimer = null;
+  let renderedMessages = 0;
 
-  function showStatus(message, isError = false) {
+  async function mcp(method, params) {
+    const res = await fetch('/mcp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: ++rpcId, method, params }),
+    });
+    const j = await res.json();
+    if (j.error) throw new Error(j.error.message || 'MCP error');
+    return j.result;
+  }
+  async function tool(name, args) {
+    const r = await mcp('tools/call', { name, arguments: args || {} });
+    return JSON.parse(r.content[0].text);
+  }
+
+  function status(message) {
     statusEl.textContent = message;
-    statusEl.className = 'status' + (isError ? ' error' : '');
     statusEl.hidden = false;
   }
-  const clearStatus = () => { statusEl.hidden = true; statusEl.textContent = ''; };
+  function clearStatus() { statusEl.hidden = true; statusEl.textContent = ''; }
 
-  function startCut() {
-    darkcut.hidden = false;
-    let i = 0;
-    dcLabel.textContent = PHASES[0];
-    phaseTimer = setInterval(() => {
-      i = Math.min(i + 1, PHASES.length - 1);
-      dcLabel.textContent = PHASES[i];
-    }, 700);
-  }
-  function endCut() {
-    clearInterval(phaseTimer);
-    phaseTimer = null;
-    darkcut.hidden = true;
-  }
-
-  async function build(e) {
-    e.preventDefault();
-    const url = urlInput.value.trim();
-    if (!url) { urlInput.focus(); return; }
-
-    buildBtn.disabled = true;
-    buildBtn.innerHTML = 'BUILDING…';
-    resultEl.hidden = true;
-    clearStatus();
-    startCut();
-
+  async function connect() {
+    connEl.className = 'conn';
+    connText.textContent = 'connecting to MCP…';
     try {
-      const res = await fetch('/api/build', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.ok) throw new Error(data.error || 'Build failed.');
-      current = data;
-      render(data);
-      clearStatus();
-    } catch (err) {
-      showStatus(err.message || 'Could not build a skill from that URL.', true);
-    } finally {
-      endCut();
-      buildBtn.disabled = false;
-      buildBtn.textContent = 'BUILD SKILL [ ↵ ]';
+      await mcp('initialize', { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'video-skill-web', version: '1.0' } });
+      const { tools } = await mcp('tools/list');
+      connEl.className = 'conn online';
+      connText.textContent = `MCP connected · ${tools.length} tools`;
+      cornerStatus.textContent = `[ mcp · ${tools.length} tools ]`;
+      toolsList.textContent = `tools: ${tools.map(t => t.name).join(' · ')}`;
+    } catch (e) {
+      connEl.className = 'conn offline';
+      connText.textContent = 'MCP offline';
+      cornerStatus.textContent = '[ mcp · offline ]';
+      status(`Could not connect to the MCP: ${e.message}`);
     }
   }
 
-  function render(data) {
-    $('result-title').textContent = data.title || data.name;
-    $('result-platform').textContent = data.platform;
-    const toolCount = (data.tools || []).length;
-    const stepCount = (data.steps || []).length;
-    $('result-counts').textContent = [toolCount && `${toolCount} TOOLS`, stepCount && `${stepCount} STEPS`].filter(Boolean).join('  ·  ');
+  function renderThread(run) {
+    threadSection.hidden = false;
+    threadMeta.textContent = `run ${run.id} · ${run.status}`;
+    const stepByKey = Object.fromEntries((run.steps || []).map(s => [s.key, s]));
+    for (let i = renderedMessages; i < (run.thread || []).length; i++) {
+      const msg = run.thread[i];
+      const step = stepByKey[msg.step];
+      const row = document.createElement('div');
+      row.className = 'msg';
+      const who = document.createElement('div');
+      who.className = 'who';
+      who.textContent = msg.role;
+      const body = document.createElement('div');
+      body.className = 'body';
+      const text = document.createElement('div');
+      text.className = 'text';
+      text.textContent = msg.text;
+      body.appendChild(text);
+      if (step) {
+        const chip = document.createElement('span');
+        chip.className = `step-chip ${step.status}`;
+        chip.textContent = `${step.label} · ${step.status === 'running' ? 'running…' : step.status}`;
+        body.appendChild(chip);
+      }
+      row.appendChild(who);
+      row.appendChild(body);
+      threadEl.appendChild(row);
+    }
+    renderedMessages = (run.thread || []).length;
+    threadEl.scrollTop = threadEl.scrollHeight;
+  }
+
+  function renderResult(result) {
+    $('result-title').textContent = result.title || result.name;
+    $('result-platform').textContent = result.platform;
+    $('result-counts').textContent = [
+      `${result.tools.length} tools`,
+      `${result.steps.length} steps`,
+      `${result.links.length} links`,
+    ].join('  ·  ');
 
     const notes = [];
-    if (data.validation && data.validation.issues && data.validation.issues.length) {
-      notes.push(`validation: ${data.validation.issues.length} note(s)`);
+    if (result.validation && result.validation.issues && result.validation.issues.length) {
+      notes.push(`validation: ${result.validation.issues.length} note(s)`);
     }
-    if ((data.warnings || []).length || (data.limitations || []).length) {
-      notes.push([...(data.warnings || []), ...(data.limitations || [])].join(' · '));
+    if ((result.warnings || []).length || (result.limitations || []).length) {
+      notes.push([...(result.warnings || []), ...(result.limitations || [])].join(' · '));
     }
     const notice = $('notice');
     if (notes.length) { notice.textContent = notes.join('   '); notice.hidden = false; }
     else notice.hidden = true;
 
     tabsEl.innerHTML = '';
-    const files = data.files || {};
     for (const [path, label] of Object.entries(TAB_LABELS)) {
-      if (!(path in files)) continue;
+      if (!(path in result.files)) continue;
       const btn = document.createElement('button');
       btn.className = 'tab' + (path === activeFile ? ' active' : '');
       btn.type = 'button';
@@ -106,18 +131,73 @@
       btn.addEventListener('click', () => {
         activeFile = path;
         for (const t of tabsEl.children) t.classList.toggle('active', t.dataset.path === path);
-        viewEl.textContent = files[path] || '(empty)';
+        viewEl.textContent = result.files[path] || '(empty)';
       });
       tabsEl.appendChild(btn);
     }
-
-    viewEl.textContent = files[activeFile] || '(empty)';
+    viewEl.textContent = result.files[activeFile] || '(empty)';
     resultEl.hidden = false;
+    resultEl.dataset.zip = result.zipUrl || '';
+  }
+
+  async function poll(id) {
+    clearInterval(pollTimer);
+    pollTimer = setInterval(async () => {
+      try {
+        const run = await tool('workflow_status', { id });
+        current = run;
+        renderThread(run);
+        if (run.status === 'done' || run.status === 'done_with_notes' || run.status === 'failed') {
+          clearInterval(pollTimer);
+          pollTimer = null;
+          runBtn.disabled = false;
+          runBtn.textContent = 'RUN WORKFLOW [ ↵ ]';
+          if (run.result) {
+            renderResult(run.result);
+            clearStatus();
+          } else {
+            status(run.error || 'The workflow finished without a built skill.');
+          }
+        }
+      } catch (e) {
+        clearInterval(pollTimer);
+        pollTimer = null;
+        runBtn.disabled = false;
+        runBtn.textContent = 'RUN WORKFLOW [ ↵ ]';
+        status(`Lost the workflow: ${e.message}`);
+      }
+    }, 800);
+  }
+
+  async function run(e) {
+    e.preventDefault();
+    const url = urlInput.value.trim();
+    if (!url) { status('Paste a source URL to give the agent a video to work from.'); urlInput.focus(); return; }
+
+    clearStatus();
+    resultEl.hidden = true;
+    threadEl.innerHTML = '';
+    renderedMessages = 0;
+    runBtn.disabled = true;
+    runBtn.innerHTML = 'RUNNING…';
+    status('Handing the task to the agent via MCP…');
+
+    try {
+      const run = await tool('run_workflow', { url });
+      threadMeta.textContent = `run ${run.id} · ${run.status}`;
+      poll(run.id);
+    } catch (err) {
+      clearInterval(pollTimer);
+      pollTimer = null;
+      runBtn.disabled = false;
+      runBtn.textContent = 'RUN WORKFLOW [ ↵ ]';
+      status(err.message || 'Could not start the workflow.');
+    }
   }
 
   async function copy() {
-    if (!current) return;
-    const text = current.files?.[activeFile] || current.files?.['SKILL.md'] || '';
+    if (!current?.result) return;
+    const text = current.result.files?.[activeFile] || current.result.files?.['SKILL.md'] || '';
     try { await navigator.clipboard.writeText(text); }
     catch {
       const ta = document.createElement('textarea');
@@ -131,11 +211,12 @@
   }
 
   function download() {
-    if (!current?.zipUrl) return;
-    window.location.href = current.zipUrl;
+    const url = resultEl.dataset.zip;
+    if (url) window.location.href = url;
   }
 
-  form.addEventListener('submit', build);
+  form.addEventListener('submit', run);
   $('copy-btn').addEventListener('click', copy);
   $('download-btn').addEventListener('click', download);
+  connect();
 })();

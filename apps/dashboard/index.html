@@ -3,20 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pond — Video to Skill</title>
-<meta name="description" content="Paste a video URL. Get a built Agent Skill with the steps and tools.">
+<title>video-skill · agent workflow</title>
+<meta name="description" content="Connect to the MCP, run the video-to-skill workflow in the agent, watch the thread, keep the result.">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="stage">
 
-  <!-- corner controls: tiny process blocks, kept active around the main word -->
+  <!-- corner controls -->
   <div class="corner tl"><span class="plus">+</span></div>
-  <div class="corner tr"><span class="micro">[ 0.001 ]</span></div>
-  <div class="corner bl"><span class="micro">CPU&nbsp; / &nbsp;01</span></div>
+  <div class="corner tr"><span class="micro" id="corner-status">[ mcp · connecting ]</span></div>
+  <div class="corner bl"><span class="micro">WORKFLOW / 01</span></div>
   <div class="corner br"><span class="micro">[ · ]</span></div>
 
-  <!-- low-contrast botanical line drawing as texture -->
   <svg class="botanical" viewBox="0 0 320 300" aria-hidden="true">
     <g fill="none" stroke="currentColor" stroke-width="1.1">
       <ellipse cx="108" cy="112" rx="56" ry="82" transform="rotate(-28 108 112)"/>
@@ -32,42 +31,59 @@
   </svg>
 
   <main class="wrap">
-    <header class="hero">
-      <div class="kicker"><span>video intelligence</span><b>/</b><span>system launch</span></div>
-      <h1>
-        <span class="big-word">Video</span><span class="arrow">→</span><span class="big-word acid">Skill</span>
-      </h1>
-      <p class="lede">One URL in. A built Agent Skill out — the steps, the tools, and how to use them.</p>
 
-      <div class="process-field" aria-hidden="true">
-        <span class="proc p1">URL IN</span>
-        <span class="proc p2">[ tools ]</span>
-        <span class="proc p3">EXTRACT</span>
-        <span class="proc p4">0.8437ms</span>
-        <span class="proc p5">COMPILE</span>
-        <span class="proc p6">READY</span>
+    <!-- masthead -->
+    <header class="masthead">
+      <div class="brand">video<span>·</span>skill</div>
+      <div class="conn" id="conn">
+        <span class="dot"></span>
+        <span id="conn-text">connecting to MCP…</span>
       </div>
     </header>
 
-    <section class="builder">
-      <form id="build-form" autocomplete="off">
-        <label class="tag" for="url">&gt; PASTE VIDEO / CONTENT URL</label>
+    <!-- hero -->
+    <section class="intro">
+      <div class="kicker"><span>agent workflow</span><b>/</b><span>model context protocol</span></div>
+      <h1>
+        <span class="big-word">Give the agent</span><span class="big-word acid">a video</span>
+      </h1>
+      <p class="lede">This page is connected to the video-skill MCP. It hands the task to the agent, shows each step as it happens, and renders the finished skill when the agent is done.</p>
+    </section>
+
+    <!-- task bar -->
+    <section class="taskbar">
+      <form id="run-form" autocomplete="off">
+        <div class="task-head">
+          <span class="tag">&gt; AGENT TASK</span>
+          <span class="tools" id="tools-list">tools: —</span>
+        </div>
+        <p class="task-prompt">Extract the source video, map its steps and tools, compile a validated Agent Skill, and show me the result.</p>
         <div class="field">
           <input id="url" type="url" inputmode="url"
-                 placeholder="https://www.youtube.com/watch?v=…"
-                 aria-label="Video or content URL" required>
-          <button id="build-btn" type="submit">BUILD SKILL <span class="key">[ ↵ ]</span></button>
+                 placeholder="source URL (optional — https://www.youtube.com/watch?v=…)"
+                 aria-label="Optional source URL">
+          <button id="run-btn" type="submit">RUN WORKFLOW <span class="key">[ ↵ ]</span></button>
         </div>
-        <p class="hint">YouTube · Instagram · X / Twitter · TikTok · Bilibili · any public page</p>
+        <p class="hint">Leave the field empty and the agent will ask you for a source. Paste a URL to start right away.</p>
       </form>
     </section>
 
     <div id="status" class="status" hidden></div>
 
+    <!-- agent thread -->
+    <section id="thread-section" class="thread-section" hidden>
+      <div class="section-head">
+        <span class="tag">// AGENT THREAD</span>
+        <span class="mono-sub" id="thread-meta">run —</span>
+      </div>
+      <div id="thread" class="thread"></div>
+    </section>
+
+    <!-- result / working tree -->
     <section id="result" class="result" hidden>
       <div class="result-head">
         <div class="result-title-block">
-          <span class="tag">// BUILT SKILL</span>
+          <span class="tag">// WORKING TREE — BUILT SKILL</span>
           <h2 id="result-title"></h2>
           <div class="meta">
             <span id="result-platform" class="chip"></span>
@@ -79,9 +95,7 @@
           <button id="download-btn" class="block brown" type="button">DOWNLOAD .ZIP</button>
         </div>
       </div>
-
       <div id="notice" class="notice" hidden></div>
-
       <div class="result-body">
         <nav id="tabs" class="tabs" role="tablist"></nav>
         <pre id="file-view" class="file-view"></pre>
@@ -89,19 +103,10 @@
     </section>
 
     <footer class="foot">
-      <span>Built from the video's public description + transcript.</span>
+      <span>Connected via MCP · <code>http://localhost:3002/mcp</code></span>
       <span>External content is untrusted — review before running.</span>
     </footer>
   </main>
-
-  <!-- full-bleed dark-brown cut during processing -->
-  <div id="darkcut" class="darkcut" hidden>
-    <div class="dc-inner">
-      <span class="dc-label" id="dc-label">BOOTING</span>
-      <div class="dc-blocks"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-      <span class="dc-sub">garden&nbsp; → &nbsp;blossoms&nbsp; → &nbsp;bees&nbsp; → &nbsp;system</span>
-    </div>
-  </div>
 
 </div>
 <script src="app.js"></script>
