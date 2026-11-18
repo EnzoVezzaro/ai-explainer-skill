@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Examples — Video Skill</title>
 <meta name="description" content="Real tutorial examples: video source, extracted workflow, generated skill artifact, and observed execution results.">
-<meta name="theme-color" content="#0f6bff">
+<meta name="theme-color" content="#f6fff0">
 <link rel="icon" href="assets/logo-mark.svg" type="image/svg+xml">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -13,7 +13,7 @@
 <a class="skip-link" href="#main">Skip to content</a>
 <div class="nav-wrap">
 <nav class="nav" aria-label="Primary">
-  <a class="brand" href="index.html">Video <span class="accent">Skill</span></a>
+  <a class="brand" href="index.html"><img src="assets/logo.svg" alt="Video Skill" width="176" height="42"></a>
   <div class="nav-links">
     <a href="index.html">Home</a>
     <a href="playground.html">Playground</a>
@@ -21,7 +21,7 @@
     <a href="examples.html" aria-current="page">Examples</a>
     <a href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">GitHub</a>
   </div>
-  <button class="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">☰</button>
+  <button class="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
 </nav>
 <div class="mobile-menu" id="mobile-menu">
   <a href="index.html">Home</a>
@@ -48,7 +48,7 @@
 
   <div class="example-grid" id="example-grid">
     <article class="example-card" data-cat="web">
-      <div class="thumb thumb-1" aria-hidden="true">◧</div>
+      <div class="thumb thumb-1" data-label="01 / WEB APP" aria-hidden="true">◧</div>
       <div class="body">
         <div class="example-meta"><span class="badge">Web app</span><span class="badge success">passed</span></div>
         <h3>Build a Next.js landing page</h3>
@@ -57,7 +57,7 @@
       </div>
     </article>
     <article class="example-card" data-cat="frontend">
-      <div class="thumb thumb-2" aria-hidden="true">◨</div>
+      <div class="thumb thumb-2" data-label="02 / FRONTEND" aria-hidden="true">◨</div>
       <div class="body">
         <div class="example-meta"><span class="badge">Frontend</span><span class="badge success">passed</span></div>
         <h3>Reproduce a UI interface</h3>
@@ -66,7 +66,7 @@
       </div>
     </article>
     <article class="example-card" data-cat="env">
-      <div class="thumb thumb-3" aria-hidden="true">⬢</div>
+      <div class="thumb thumb-3" data-label="03 / ENVIRONMENT" aria-hidden="true">⬢</div>
       <div class="body">
         <div class="example-meta"><span class="badge">Environment</span><span class="badge success">passed</span></div>
         <h3>Configure a dev environment</h3>
@@ -75,7 +75,7 @@
       </div>
     </article>
     <article class="example-card" data-cat="browser">
-      <div class="thumb thumb-4" aria-hidden="true">⬣</div>
+      <div class="thumb thumb-4" data-label="04 / BROWSER" aria-hidden="true">⬣</div>
       <div class="body">
         <div class="example-meta"><span class="badge">Browser</span><span class="badge warn">unverified</span></div>
         <h3>Automate a browser workflow</h3>
@@ -84,7 +84,7 @@
       </div>
     </article>
     <article class="example-card" data-cat="api">
-      <div class="thumb thumb-5" aria-hidden="true">⬔</div>
+      <div class="thumb thumb-5" data-label="05 / API" aria-hidden="true">⬔</div>
       <div class="body">
         <div class="example-meta"><span class="badge">API</span><span class="badge success">passed</span></div>
         <h3>Integrate an API</h3>
@@ -93,7 +93,7 @@
       </div>
     </article>
     <article class="example-card" data-cat="web">
-      <div class="thumb thumb-6" aria-hidden="true">⬒</div>
+      <div class="thumb thumb-6" data-label="06 / SWE TUTORIAL" aria-hidden="true">⬒</div>
       <div class="body">
         <div class="example-meta"><span class="badge">SWE tutorial</span><span class="badge warn">prepared</span></div>
         <h3>End-to-end engineering workflow</h3>
