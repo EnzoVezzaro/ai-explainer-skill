@@ -15,40 +15,40 @@
   var year = document.getElementById('year');
   if (year) year.textContent = '· ' + new Date().getFullYear();
 
-  // Active nav highlight
+  // Docs table of contents highlight. The primary nav carries its single
+  // aria-current value in the shared markup, so it is not touched here.
   try {
     var path = location.pathname.split('/').pop() || 'index.html';
-    document.querySelectorAll('.nav-links a, .docs-nav a').forEach(function (a) {
+    document.querySelectorAll('.docs-nav a').forEach(function (a) {
       var href = a.getAttribute('href') || '';
       if (href === path || (path === '' && href === 'index.html')) a.setAttribute('aria-current', 'page');
-      if (href === 'docs/' && location.pathname.indexOf('/docs/') !== -1 && !a.closest('.docs-nav')) a.setAttribute('aria-current', 'page');
     });
   } catch (e) {}
 
-  // Mobile menu toggle (works on every page)
-  var btns = document.querySelectorAll('.menu-btn');
-  btns.forEach(function (btn) {
-    var menuId = btn.getAttribute('aria-controls') || 'mobile-menu';
-    var menu = document.getElementById(menuId) || document.querySelector('.mobile-menu');
-    if (!menu) return;
-    btn.addEventListener('click', function () {
-      var open = menu.classList.toggle('open');
-      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  // The one primary nav: the same element collapses and expands at every size.
+  var menuBtn = document.querySelector('.menu-btn');
+  var siteNav = document.getElementById('site-nav');
+  if (menuBtn && siteNav) {
+    function closeNav() {
+      siteNav.classList.remove('open');
+      menuBtn.setAttribute('aria-expanded', 'false');
+      menuBtn.setAttribute('aria-label', 'Open menu');
+    }
+    menuBtn.addEventListener('click', function () {
+      var open = siteNav.classList.toggle('open');
+      menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      menuBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
     });
-    menu.querySelectorAll('a').forEach(function (a) {
-      a.addEventListener('click', function () {
-        menu.classList.remove('open');
-        btn.setAttribute('aria-expanded', 'false');
-      });
+    siteNav.querySelectorAll('a').forEach(function (a) {
+      a.addEventListener('click', closeNav);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeNav();
     });
     window.addEventListener('resize', function () {
-      if (window.innerWidth >= 820 && menu.classList.contains('open')) {
-        menu.classList.remove('open');
-        btn.setAttribute('aria-expanded', 'false');
-      }
+      if (window.innerWidth >= 900) closeNav();
     });
-  });
+  }
 
   // Robust copy helper with clipboard fallback
   function copyText(text, btn) {

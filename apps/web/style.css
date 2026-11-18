@@ -97,12 +97,20 @@ li { margin: .3rem 0; }
 .nav .brand { display: inline-flex; align-items: center; text-decoration: none; }
 .nav .brand:hover { text-decoration: none; }
 .nav .brand img { height: 42px; width: auto; }
-.nav-links { display: none; gap: 4px; align-items: center; }
-.nav-links a {
-  display: inline-flex; align-items: center; min-height: 44px; padding: 0 11px;
-  border: 1px solid transparent; text-decoration: none;
-  font: 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase;
+/* One nav for every viewport and every page: it collapses on small screens,
+   it is not duplicated into a second mobile menu. */
+.nav-links {
+  display: none; position: absolute; top: 100%; inset-inline: 0;
+  flex-direction: column; gap: 0; padding: 8px 24px 16px;
+  background: var(--paper); border-bottom: 2px solid var(--ink);
 }
+.nav-links.open { display: flex; }
+.nav-links a {
+  display: flex; align-items: center; min-height: 44px; padding: 10px;
+  border-bottom: 1px solid var(--ink-12); text-decoration: none;
+  font: 11px/1.4 var(--mono); letter-spacing: .08em; text-transform: uppercase;
+}
+.nav-links a:last-child { border-bottom: 0; }
 .nav-links a:hover, .nav-links a[aria-current="page"] {
   background: var(--acid); border-color: var(--ink); font-weight: 700; text-decoration: none;
 }
@@ -113,15 +121,17 @@ li { margin: .3rem 0; }
 }
 .menu-btn:hover { background: var(--acid); }
 .menu-btn:active { transform: translate(0, 0); background: var(--mint); }
-.mobile-menu { display: none; padding: 6px 24px 18px; border-top: 1px solid var(--ink-12); }
-.mobile-menu.open { display: block; }
-.mobile-menu a {
-  display: block; min-height: 44px; padding: 12px 2px; border-bottom: 1px solid var(--ink-12);
-  text-decoration: none; font: 11px/1.4 var(--mono);
-  letter-spacing: .08em; text-transform: uppercase;
+@media (min-width: 900px) {
+  .nav-links {
+    display: flex; position: static; flex-direction: row; gap: 4px;
+    padding: 0; background: none; border: 0;
+  }
+  .nav-links a {
+    min-height: 44px; padding: 0 11px; border: 1px solid transparent;
+    font: 11px/1 var(--mono);
+  }
+  .menu-btn { display: none; }
 }
-.mobile-menu a:last-child { border-bottom: 0; }
-@media (min-width: 900px) { .nav-links { display: flex; } .menu-btn { display: none; } }
 
 /* Type ------------------------------------------------------------------ */
 .label, .kicker, .eyebrow {
@@ -438,6 +448,6 @@ code, .num, .kicker, .label, .badge, .chip, .tag, .value, .history-list time {
   .spinner { animation: none; border-top-color: var(--ink); }
 }
 @media print {
-  .nav-wrap, .mobile-menu, .hero-actions, .actions, .copy, .copy-btn, .toast, footer nav { display: none !important; }
+  .nav-wrap, .nav-links, .menu-btn, .hero-actions, .actions, .copy, .copy-btn, .toast, footer nav { display: none !important; }
   body { font-size: 12pt; }
 }
