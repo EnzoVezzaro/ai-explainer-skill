@@ -235,33 +235,18 @@
     if (url) window.location.href = url;
   }
 
-  async function installSuite() {
-    const btn = $('install-btn');
-    const box = $('install-result');
+  async function copyInstructions() {
+    const btn = $('copy-instructions-btn');
     const old = btn.textContent;
-    btn.disabled = true;
-    btn.textContent = 'INSTALLING…';
-    box.hidden = true;
+    btn.textContent = 'COPYING…';
     try {
-      const res = await fetch('/api/install', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: '{}',
-      });
-      const data = await res.json();
-      if (!res.ok || !data.ok) throw new Error(data.error || 'Install failed');
-      const installed = data.results.filter(r => r.ok);
-      const already = data.results.filter(r => r.code === 'TARGET_EXISTS');
-      box.textContent = `Installed ${installed.length} · already present ${already.length} · agents: ${data.detected.join(', ')} · skills: ${data.skills.join(', ')}`;
-      box.hidden = false;
-      btn.textContent = 'INSTALLED ✓';
-      setTimeout(() => { btn.textContent = old; }, 1800);
+      const res = await fetch('/api/agent-kit');
+      if (!res.ok) throw new Error(`Unavailable (${res.status})`);
+      const text = await res.text();
+      await copyText(text, btn);
     } catch (e) {
-      box.textContent = `Install failed: ${e.message}`;
-      box.hidden = false;
+      status(`Could not copy instructions: ${e.message}`);
       btn.textContent = old;
-    } finally {
-      btn.disabled = false;
     }
   }
 
@@ -269,6 +254,6 @@
   $('copy-config').addEventListener('click', (e) => copyText($('mcp-config').textContent, e.currentTarget));
   $('copy-btn').addEventListener('click', copySkill);
   $('download-btn').addEventListener('click', download);
-  $('install-btn').addEventListener('click', installSuite);
+  $('copy-instructions-btn').addEventListener('click', copyInstructions);
   connect();
 })();

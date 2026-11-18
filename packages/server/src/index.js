@@ -3,7 +3,6 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import { CollectionManager } from '../../collection-manager/src/index.js';
-import { installSkillSuite } from '../../cli/src/installers.js';
 import { WorkflowEngine } from './workflow.js';
 import { extractVideo } from '../../agent-reach-adapter/src/index.js';
 import { compileSkill, validateSkillDir } from '../../skill-compiler/src/index.js';
@@ -37,9 +36,16 @@ class MCPServer {
   /** Handle a JSON-RPC request */
   async handleRequest(message) {
     const { jsonrpc, id, method, params } = message;
+    // JSON-RPC notifications have no id and MUST NOT receive a response body.
+    if (method && method.startsWith('notifications/')) {
+      return null;
+    }
     try {
       let result;
       switch (method) {
+        case 'ping':
+          result = {};
+          break;
         case 'initialize':
           result = {
             protocolVersion: params?.protocolVersion || '2024-11-05',
@@ -420,6 +426,8 @@ export function createApp() {
   // MCP endpoint (HTTP POST)
   app.post('/mcp', async (req, res) => {
     const response = await mcp.handleRequest(req.body);
+    // Notifications (no id) must get 202 Accepted with no body per JSON-RPC/MCP.
+    if (response === null) return res.status(202).end();
     res.json(response);
   });
 
@@ -488,17 +496,42 @@ export function createApp() {
     }).catch(() => res.status(404).json({ error: 'Build not found.' }));
   });
 
-  // Install the full skill suite into every detected coding harness.
-  app.post('/api/install', async (req, res) => {
-    try {
-      const result = await installSkillSuite({
-        skillsDir: path.join(REPO_ROOT, 'skills'),
-        force: Boolean(req.body?.force),
-      });
-      res.json(result);
-    } catch (e) {
-      res.status(500).json({ ok: false, error: e.message || String(e) });
+  // Paste-ready instructions + skill files for an external agent.
+  app.get('/api/agent-kit', async (_req, res) => {
+    const skillDir = path.join(REPO_ROOT, 'skills');
+    const rels = [
+      ['video-skill/SKILL.md', 'video-skill'],
+      ['video-skill-learn/SKILL.md', 'video-skill-learn'],
+      ['video-skill-create/SKILL.md', 'video-skill-create'],
+      ['video-skill-verify/SKILL.md', 'video-skill-verify'],
+    ];
+    const parts = [
+      '# Video Skill — instructions for your agent',
+      '',
+      'You have the video-skill MCP at `http://localhost:3002/mcp`. Use it to turn a public tutorial video into a portable Agent Skill.',
+      '',
+      '## Your task',
+      'When I give you a video URL, turn it into a skill:',
+      '',
+      '1. `run_workflow({ url })` → returns a workflow `id`.',
+      '2. `workflow_status({ id })` → poll until `done`; returns the agent thread, steps and the built skill.',
+      '3. Present the finished skill (SKILL.md, tools.md, walkthrough.md, source.md, dependencies.md). Never fabricate a result — report the real status.',
+      '',
+      'Also available: `extract`, `compile`, `validate`, `list_collections`.',
+      '',
+      '## MCP connection',
+      '',
+      '```json',
+      JSON.stringify({ mcpServers: { 'video-skill': { type: 'http', url: 'http://localhost:3002/mcp' } } }, null, 2),
+      '```',
+      '',
+    ];
+    for (const [rel, label] of rels) {
+      let text = '';
+      try { text = await fs.readFile(path.join(skillDir, rel), 'utf8'); } catch {}
+      parts.push(`---\n\n## Skill: ${label}\n\n${text || '(unavailable)'}\n`);
     }
+    res.type('text/plain').send(parts.join('\n'));
   });
 
   // Workflow runs (MCP-driven). The site connects to the MCP; these are a thin
