@@ -1,13 +1,12 @@
 (() => {
   const $ = (id) => document.getElementById(id);
-  const form = $('run-form');
-  const urlInput = $('url');
-  const runBtn = $('run-btn');
-  const statusEl = $('status');
   const connEl = $('conn');
   const connText = $('conn-text');
+  const connMeta = $('conn-meta');
   const cornerStatus = $('corner-status');
-  const toolsList = $('tools-list');
+  const toolList = $('tool-list');
+  const waiting = $('waiting');
+  const statusEl = $('status');
   const threadSection = $('thread-section');
   const threadEl = $('thread');
   const threadMeta = $('thread-meta');
@@ -22,12 +21,17 @@
     'references/source.md': 'SOURCE',
     'references/dependencies.md': 'DEPS',
   };
+  const SAMPLE_URL = 'https://www.youtube.com/watch?v=9NubqbSNbjg';
 
   let rpcId = 0;
-  let pollTimer = null;
-  let current = null;      // latest workflow snapshot
-  let activeFile = 'SKILL.md';
+  let watchTimer = null;
+  let following = null;       // workflow id we are rendering
   let renderedMessages = 0;
+  let seen = new Map();       // id -> { status, updatedAt }
+  let activeFile = 'SKILL.md';
+  let latestResult = null;
+  let connected = false;
+  let firstPoll = true;
 
   async function mcp(method, params) {
     const res = await fetch('/mcp', {
@@ -43,7 +47,6 @@
     const r = await mcp('tools/call', { name, arguments: args || {} });
     return JSON.parse(r.content[0].text);
   }
-
   function status(message) {
     statusEl.textContent = message;
     statusEl.hidden = false;
@@ -56,16 +59,29 @@
     try {
       await mcp('initialize', { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'video-skill-web', version: '1.0' } });
       const { tools } = await mcp('tools/list');
+      connected = true;
       connEl.className = 'conn online';
       connText.textContent = `MCP connected · ${tools.length} tools`;
       cornerStatus.textContent = `[ mcp · ${tools.length} tools ]`;
-      toolsList.textContent = `tools: ${tools.map(t => t.name).join(' · ')}`;
+      connMeta.textContent = 'connected · watching for runs…';
+      toolList.innerHTML = '';
+      for (const t of tools) {
+        const li = document.createElement('li');
+        li.textContent = t.name;
+        toolList.appendChild(li);
+      }
+      startWatching();
     } catch (e) {
       connEl.className = 'conn offline';
       connText.textContent = 'MCP offline';
       cornerStatus.textContent = '[ mcp · offline ]';
+      connMeta.textContent = 'disconnected';
       status(`Could not connect to the MCP: ${e.message}`);
     }
+  }
+
+  function isFinished(run) {
+    return ['done', 'done_with_notes', 'failed'].includes(run.status);
   }
 
   function renderThread(run) {
@@ -140,74 +156,80 @@
     resultEl.dataset.zip = result.zipUrl || '';
   }
 
-  async function poll(id) {
-    clearInterval(pollTimer);
-    pollTimer = setInterval(async () => {
-      try {
-        const run = await tool('workflow_status', { id });
-        current = run;
-        renderThread(run);
-        if (run.status === 'done' || run.status === 'done_with_notes' || run.status === 'failed') {
-          clearInterval(pollTimer);
-          pollTimer = null;
-          runBtn.disabled = false;
-          runBtn.textContent = 'RUN WORKFLOW [ ↵ ]';
-          if (run.result) {
-            renderResult(run.result);
-            clearStatus();
-          } else {
-            status(run.error || 'The workflow finished without a built skill.');
-          }
-        }
-      } catch (e) {
-        clearInterval(pollTimer);
-        pollTimer = null;
-        runBtn.disabled = false;
-        runBtn.textContent = 'RUN WORKFLOW [ ↵ ]';
-        status(`Lost the workflow: ${e.message}`);
-      }
-    }, 800);
-  }
-
-  async function run(e) {
-    e.preventDefault();
-    const url = urlInput.value.trim();
-    if (!url) { status('The agent needs a source — paste a video or content URL to start the workflow.'); urlInput.focus(); return; }
-
-    clearStatus();
-    resultEl.hidden = true;
-    threadEl.innerHTML = '';
-    renderedMessages = 0;
-    runBtn.disabled = true;
-    runBtn.innerHTML = 'RUNNING…';
-    status('Handing the task to the agent via MCP…');
-
+  async function watch() {
+    if (!connected) return;
     try {
-      const run = await tool('run_workflow', { url });
-      threadMeta.textContent = `run ${run.id} · ${run.status}`;
-      poll(run.id);
-    } catch (err) {
-      clearInterval(pollTimer);
-      pollTimer = null;
-      runBtn.disabled = false;
-      runBtn.textContent = 'RUN WORKFLOW [ ↵ ]';
-      status(err.message || 'Could not start the workflow.');
+      const runs = await tool('list_workflows');
+      // Newest first (server already sorts, but be safe)
+      runs.sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+
+      // On the first poll, remember existing runs but only follow one that is
+      // still running (an agent is mid-task). Finished runs are not replayed.
+      for (const r of runs) {
+        const prev = seen.get(r.id);
+        if (!prev) {
+          seen.set(r.id, { status: r.status, updatedAt: r.updatedAt });
+          if (!following && (!firstPoll || r.status === 'running')) {
+            following = r.id;
+            renderedMessages = 0;
+            threadEl.innerHTML = '';
+            resultEl.hidden = true;
+            waiting.hidden = true;
+            connMeta.textContent = `following run ${r.id} · ${r.status}`;
+          }
+        } else {
+          seen.set(r.id, { status: r.status, updatedAt: r.updatedAt });
+        }
+      }
+      firstPoll = false;
+
+      if (!following) {
+        connMeta.textContent = 'connected · watching for runs…';
+        return;
+      }
+
+      // Fetch the full snapshot of the run we follow (thread + result).
+      const run = await tool('workflow_status', { id: following });
+      waiting.hidden = true;
+      renderThread(run);
+      if (isFinished(run) && run.result) {
+        latestResult = run.result;
+        renderResult(run.result);
+        connMeta.textContent = `run ${run.id} · ${run.status} · result ready · watching for next…`;
+        // Stop following this run, but keep watching for the agent's next one.
+        following = null;
+      } else if (run.status === 'failed') {
+        status(run.error || 'The workflow failed.');
+        following = null;
+      }
+    } catch (e) {
+      // Transient: keep watching, but surface the problem once.
+      status(`Watcher error: ${e.message}`);
     }
   }
 
-  async function copy() {
-    if (!current?.result) return;
-    const text = current.result.files?.[activeFile] || current.result.files?.['SKILL.md'] || '';
+  function startWatching() {
+    clearInterval(watchTimer);
+    watchTimer = setInterval(watch, 1000);
+    watch();
+  }
+
+  async function copyText(text, btn) {
     try { await navigator.clipboard.writeText(text); }
     catch {
       const ta = document.createElement('textarea');
       ta.value = text; document.body.appendChild(ta); ta.select();
       document.execCommand('copy'); ta.remove();
     }
-    const btn = $('copy-btn');
     const old = btn.textContent;
     btn.textContent = 'COPIED ✓';
     setTimeout(() => { btn.textContent = old; }, 1400);
+  }
+
+  async function copySkill() {
+    if (!latestResult) return;
+    const text = latestResult.files?.[activeFile] || latestResult.files?.['SKILL.md'] || '';
+    await copyText(text, $('copy-btn'));
   }
 
   function download() {
@@ -215,8 +237,33 @@
     if (url) window.location.href = url;
   }
 
-  form.addEventListener('submit', run);
-  $('copy-btn').addEventListener('click', copy);
+  async function runSample() {
+    const btn = $('sample-btn');
+    btn.disabled = true;
+    const old = btn.textContent;
+    btn.textContent = 'STARTING…';
+    clearStatus();
+    try {
+      const run = await tool('run_workflow', { url: SAMPLE_URL });
+      seen.set(run.id, { status: run.status, updatedAt: run.updatedAt });
+      following = run.id;
+      renderedMessages = 0;
+      threadEl.innerHTML = '';
+      resultEl.hidden = true;
+      waiting.hidden = true;
+      if (!watchTimer) startWatching();
+    } catch (e) {
+      status(e.message || 'Could not start the sample workflow.');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = old;
+    }
+  }
+
+  $('copy-endpoint').addEventListener('click', (e) => copyText('http://localhost:3002/mcp', e.currentTarget));
+  $('copy-config').addEventListener('click', (e) => copyText($('mcp-config').textContent, e.currentTarget));
+  $('copy-btn').addEventListener('click', copySkill);
   $('download-btn').addEventListener('click', download);
+  $('sample-btn').addEventListener('click', runSample);
   connect();
 })();

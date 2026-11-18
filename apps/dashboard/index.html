@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>video-skill · agent workflow</title>
-<meta name="description" content="Connect to the MCP, run the video-to-skill workflow in the agent, watch the thread, keep the result.">
+<meta name="description" content="Connect your agent to the video-skill MCP. Watch the workflow and keep the built skill.">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -41,32 +41,64 @@
       </div>
     </header>
 
-    <!-- hero -->
+    <!-- intro -->
     <section class="intro">
       <div class="kicker"><span>agent workflow</span><b>/</b><span>model context protocol</span></div>
       <h1>
-        <span class="big-word">Give the agent</span><span class="big-word acid">a video</span>
+        <span class="big-word">Your agent</span><span class="big-word acid">does the work</span>
       </h1>
-      <p class="lede">This page is connected to the video-skill MCP. It hands the task to the agent, shows each step as it happens, and renders the finished skill when the agent is done.</p>
+      <p class="lede">This page is connected to the video-skill MCP. Connect your coding agent to the same endpoint, start a workflow there, and the built skill appears here when the agent is done.</p>
     </section>
 
-    <!-- task bar -->
-    <section class="taskbar">
-      <form id="run-form" autocomplete="off">
-        <div class="task-head">
-          <span class="tag">&gt; AGENT TASK</span>
-          <span class="tools" id="tools-list">tools: —</span>
+    <!-- MCP connection -->
+    <section class="connection">
+      <div class="section-head">
+        <span class="tag">// MCP CONNECTION</span>
+        <span class="mono-sub" id="conn-meta">waiting for agent…</span>
+      </div>
+
+      <div class="conn-body">
+        <div class="conn-col">
+          <p class="conn-lead">Add this server to your agent, then call <code>run_workflow</code> with a source URL. The run shows up here as it happens.</p>
+          <div class="endpoint">
+            <span class="tag">ENDPOINT</span>
+            <code>http://localhost:3002/mcp</code>
+            <button id="copy-endpoint" class="block mint" type="button">COPY</button>
+          </div>
+          <div class="config">
+            <span class="tag">AGENT CONFIG</span>
+            <pre id="mcp-config">{
+  "mcpServers": {
+    "video-skill": {
+      "type": "http",
+      "url": "http://localhost:3002/mcp"
+    }
+  }
+}</pre>
+            <button id="copy-config" class="block" type="button">COPY CONFIG</button>
+          </div>
         </div>
-        <p class="task-prompt">Extract the source video, map its steps and tools, compile a validated Agent Skill, and show me the result.</p>
-        <div class="field">
-          <input id="url" type="url" inputmode="url"
-                 placeholder="source URL (optional — https://www.youtube.com/watch?v=…)"
-                 aria-label="Optional source URL">
-          <button id="run-btn" type="submit">RUN WORKFLOW <span class="key">[ ↵ ]</span></button>
+
+        <div class="conn-col side">
+          <span class="tag">WORKFLOW TOOLS</span>
+          <ul id="tool-list" class="tool-list">
+            <li>run_workflow</li>
+            <li>workflow_status</li>
+            <li>list_workflows</li>
+            <li>extract · compile · validate</li>
+          </ul>
+          <span class="tag">IN YOUR AGENT</span>
+          <code class="agent-cmd">run_workflow(url)</code>
+          <p class="hint">Or load the <code>video-skill</code> skill and ask it to turn a video into a skill — it calls the same tools.</p>
+          <button id="sample-btn" class="block acid" type="button">RUN SAMPLE WORKFLOW</button>
         </div>
-        <p class="hint">The agent needs a source to work from — paste a video or content URL above to start the run.</p>
-      </form>
+      </div>
     </section>
+
+    <div id="waiting" class="waiting">
+      <span class="waiting-mark">[ · ]</span>
+      Watching for a workflow from your agent…
+    </div>
 
     <div id="status" class="status" hidden></div>
 

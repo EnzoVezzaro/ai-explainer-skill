@@ -46,21 +46,30 @@ body { background: var(--paper); color: var(--ink); font: 15px/1.6 -apple-system
 .big-word.acid { background: var(--acid); padding: 2px 16px 8px; box-shadow: 8px 8px 0 var(--ink); }
 .lede { max-width: 620px; font-size: 15px; color: rgba(50,23,13,.72); margin: 0; }
 
-/* task bar */
-.taskbar { border: 2px solid var(--ink); background: #fff; padding: 22px 24px; margin-top: 10px; }
-.task-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+/* MCP connection */
 .tag { display: inline-block; font: 11px/1 var(--mono); letter-spacing: .08em; color: rgba(50,23,13,.7); }
-.tools { font: 10px/1 var(--mono); color: rgba(50,23,13,.5); }
-.task-prompt { font: italic 400 22px/1.35 var(--serif); margin: 14px 0 20px; max-width: 720px; }
-.field { display: flex; gap: 0; border: 2px solid var(--ink); background: var(--paper); }
-.field input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; padding: 16px; font: 14px/1.4 var(--mono); color: var(--ink); }
-.field input::placeholder { color: rgba(50,23,13,.4); }
-.field input:focus { background: #fffef4; }
-.field button { border: 0; border-left: 2px solid var(--ink); background: var(--acid); color: var(--ink); padding: 0 20px; font: 700 12px/1 var(--mono); letter-spacing: .07em; cursor: pointer; white-space: nowrap; }
-.field button:hover { background: #c2f244; }
-.field button:disabled { opacity: .55; cursor: wait; }
-.field button .key { font-weight: 400; opacity: .6; }
-.hint { margin: 12px 2px 0; font: 11px/1.5 var(--mono); color: rgba(50,23,13,.55); }
+.connection { border: 2px solid var(--ink); background: #fff; margin-top: 10px; }
+.section-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 2px solid var(--ink); background: rgba(211,252,85,.18); }
+.mono-sub { font: 11px/1 var(--mono); color: rgba(50,23,13,.62); }
+.conn-body { display: grid; grid-template-columns: 1.4fr 1fr; }
+.conn-col { padding: 20px 22px; min-width: 0; }
+.conn-col.side { border-left: 2px solid var(--ink); background: var(--paper); }
+.conn-lead { margin: 0 0 18px; font: 13px/1.7 -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; color: rgba(50,23,13,.78); }
+.conn-lead code, .hint code { font: 12px/1 var(--mono); background: var(--acid); padding: 2px 5px; }
+.endpoint { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+.endpoint code { font: 12px/1 var(--mono); background: var(--paper); border: 1px solid var(--ink); padding: 9px 10px; flex: 1; min-width: 0; }
+.config .tag { margin-bottom: 8px; }
+.config pre { margin: 0 0 10px; padding: 12px; background: var(--ink); color: var(--paper); font: 11px/1.6 var(--mono); overflow: auto; }
+.tool-list { list-style: none; margin: 8px 0 20px; padding: 0; }
+.tool-list li { font: 11px/1.6 var(--mono); padding: 5px 0; border-bottom: 1px solid rgba(50,23,13,.15); }
+.tool-list li::before { content: '› '; color: rgba(50,23,13,.45); }
+.agent-cmd { display: block; font: 12px/1 var(--mono); background: var(--purple); border: 1px solid var(--ink); padding: 10px; margin: 8px 0 0; }
+.hint { margin: 10px 0 0; font: 11px/1.5 var(--mono); color: rgba(50,23,13,.55); }
+.block.acid { background: var(--acid); }
+#sample-btn { margin-top: 14px; width: 100%; }
+
+.waiting { margin: 24px 0 0; padding: 18px 20px; border: 1px solid var(--ink); background: var(--mint); font: 12px/1 var(--mono); letter-spacing: .04em; }
+.waiting-mark { margin-right: 8px; }
 
 .status { margin: 20px 0 0; padding: 14px 16px; border: 1px solid var(--ink); background: var(--pink); font: 12px/1.5 var(--mono); }
 
@@ -108,9 +117,8 @@ body { background: var(--paper); color: var(--ink); font: 15px/1.6 -apple-system
   .intro h1 { gap: 8px; }
   .big-word { font-size: clamp(32px, 8vw, 52px); }
   .big-word.acid { padding: 2px 10px 6px; box-shadow: 5px 5px 0 var(--ink); }
-  .task-prompt { font-size: 19px; }
-  .field { flex-direction: column; }
-  .field button { border-left: 0; border-top: 2px solid var(--ink); padding: 16px; }
+  .conn-body { grid-template-columns: 1fr; }
+  .conn-col.side { border-left: 0; border-top: 2px solid var(--ink); }
   .msg { flex-direction: column; gap: 6px; }
   .msg .who { flex: none; }
   .result-body { flex-direction: column; }
