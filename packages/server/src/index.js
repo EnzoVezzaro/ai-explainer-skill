@@ -432,7 +432,7 @@ export function createApp() {
   });
 
   // One-shot: URL -> built skill (extract + compile + validate + zip). Stateless, no collection needed.
-  const SKILL_FILES = ['SKILL.md', 'references/tools.md', 'references/walkthrough.md', 'references/source.md', 'references/dependencies.md'];
+  const SKILL_FILES = ['SKILL.md', 'references/tools.md', 'references/walkthrough.md', 'references/source.md', 'references/dependencies.md', 'build/README.md', 'build/INSTRUCTIONS.md', 'build/CHECKLIST.md', 'build/transcript.md', 'build/links.md'];
   const buildRoot = path.join(os.tmpdir(), 'video-skill-builds');
 
   app.post('/api/build', async (req, res) => {

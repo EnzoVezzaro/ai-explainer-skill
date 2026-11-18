@@ -1,10 +1,10 @@
 ---
-name: anthropic-just-released-the-new-rules-of-claude-code
+name: claude-code-top-1-percent
 description: Reproduce the workflow taught in \"Anthropic Just Released the New Rules of Claude Code\" (https://www.youtube.com/watch?v=8Pg6G5h05hk). Use when the user asks to follow or adapt this tutorial.
 metadata:
   generated-by: video-skill
   source-url: https://www.youtube.com/watch?v=8Pg6G5h05hk
-  retrieved-at: 2026-11-18T12:59:58.158Z
+  retrieved-at: 2026-11-18T13:12:44.953Z
   tool-count: 0
 ---
 
@@ -39,8 +39,8 @@ Reproduce the workflow taught in the source video in a compatible project: use t
 - URL: https://www.youtube.com/watch?v=8Pg6G5h05hk
 - Platform: youtube
 - Author: Nate Herk | AI Automation
-- Retrieved at: 2026-11-18T12:59:58.158Z
-- Limitations: Transcript unavailable via Agent Reach transcribe: Platform reported a rate limit; youtube subtitle: yt-dlp exited 1: ERROR: Unable to download video subtitles for 'zh-Hans': HTTP Error 429: Too Many Requests
+- Retrieved at: 2026-11-18T13:12:44.953Z
+- Limitations: Transcript unavailable via Agent Reach transcribe: Platform reported a rate limit; youtube read: Platform reported a rate limit; youtube subtitle: Platform reported a rate limit
 
 ## Verification
 

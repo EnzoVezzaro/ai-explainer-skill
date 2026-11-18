@@ -88,6 +88,40 @@ describe('compileSkill', () => {
     const validation = await validateSkillDir(compiled.path);
     assertStrict.ok(validation.ok, JSON.stringify(validation.issues));
   });
+
+  it('writes a build folder with transcript-grounded replication steps', async () => {
+    await fs.rm(TMP, { recursive: true, force: true });
+    const extraction = {
+      ok: true,
+      source: { url: 'https://www.youtube.com/watch?v=abc', platform: 'youtube', title: 'Claude Code Rules', author: 'Nate', retrievedAt: '2026-01-01T00:00:00.000Z', retrievalTools: [], limitations: [] },
+      description: 'deny rules and hooks',
+      transcript: 'Use deny rules to block .env. Auto mode checks commands.',
+      transcriptSegments: [
+        { seconds: 0, text: 'Deny rules block the .env file.' },
+        { seconds: 26, text: 'Auto mode checks commands before running.' },
+      ],
+      steps: [
+        { timestamp: '0:00', label: 'Intro' },
+        { timestamp: '0:26', label: 'Auto mode' },
+      ],
+      links: ['https://docs.example.com'],
+      tools: [],
+      warnings: [], evidence: [],
+    };
+    const compiled = await compileSkill(extraction, { outDir: TMP, name: 'claude-rules' });
+    assertStrict.strictEqual(compiled.buildSteps, 2);
+    const dir = await fs.readdir(path.join(compiled.path, 'build'));
+    for (const f of ['README.md', 'INSTRUCTIONS.md', 'CHECKLIST.md', 'transcript.md', 'links.md']) {
+      assertStrict.ok(dir.includes(f), `missing build/${f}`);
+    }
+    const instructions = await fs.readFile(path.join(compiled.path, 'build', 'INSTRUCTIONS.md'), 'utf8');
+    assertStrict.ok(instructions.includes('Step 1'));
+    assertStrict.ok(instructions.includes('Deny rules block the .env file.'));
+    assertStrict.ok(instructions.includes('Task for the agent'));
+    const transcript = await fs.readFile(path.join(compiled.path, 'build', 'transcript.md'), 'utf8');
+    assertStrict.ok(transcript.includes('[0:00]'));
+    assertStrict.ok((await validateSkillDir(compiled.path)).ok);
+  });
 });
 
 describe('detectPlatform (compiler context)', () => {

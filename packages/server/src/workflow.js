@@ -12,7 +12,7 @@ import { spawnSync } from 'node:child_process';
 import { extractVideo } from '../../agent-reach-adapter/src/index.js';
 import { compileSkill, validateSkillDir } from '../../skill-compiler/src/index.js';
 
-const SKILL_FILES = ['SKILL.md', 'references/tools.md', 'references/walkthrough.md', 'references/source.md', 'references/dependencies.md'];
+const SKILL_FILES = ['SKILL.md', 'references/tools.md', 'references/walkthrough.md', 'references/source.md', 'references/dependencies.md', 'build/README.md', 'build/INSTRUCTIONS.md', 'build/CHECKLIST.md', 'build/transcript.md', 'build/links.md'];
 
 const STEP_DEFS = [
   { key: 'connect',  label: 'Connect to MCP',   say: 'Connected to video-skill MCP. I will extract the source, map its steps, and compile a portable Agent Skill.' },

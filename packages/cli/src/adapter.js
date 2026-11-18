@@ -126,6 +126,12 @@ function ytDlpMeta(json) {
   };
 }
 
+function decodeEntities(s) {
+  return String(s)
+    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&#x27;/g, "'");
+}
+
 function cleanVtt(vtt) {
   if (!vtt) return '';
   return vtt
@@ -136,6 +142,48 @@ function cleanVtt(vtt) {
     .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#39;/g, "'").replace(/&quot;/g, '"')
     .replace(/\n{2,}/g, '\n')
     .trim();
+}
+
+/**
+ * Parse VTT into timed segments and de-duplicate YouTube's rolling captions
+ * (each block repeats the previous text plus a few new words). Returns an
+ * array of { seconds, text } used to ground the build instructions per step.
+ */
+function parseVttSegments(vtt) {
+  if (!vtt || !/--\s*>/.test(vtt)) return [];
+  const raw = [];
+  for (const block of String(vtt).split(/\r?\n\r?\n/)) {
+    const tm = block.match(/(\d{2}):(\d{2}):(\d{2})\.(\d{3})\s+-->\s+\d{2}:\d{2}:\d{2}\.\d{3}/);
+    if (!tm) continue;
+    const seconds = Number(tm[1]) * 3600 + Number(tm[2]) * 60 + Number(tm[3]) + Number(tm[4]) / 1000;
+    let text = block.replace(/^[^\n]*-->[^\n]*\r?\n/, '');
+    text = decodeEntities(text.replace(/<[^>]+>/g, ''));
+    text = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean).join(' ');
+    if (text) raw.push({ seconds, text });
+  }
+  const out = [];
+  let prev = '';
+  for (const seg of raw) {
+    let t = seg.text;
+    if (prev && t.startsWith(prev)) t = t.slice(prev.length).trim();
+    else if (prev) {
+      const pw = prev.split(' '), cw = t.split(' ');
+      let overlap = 0;
+      for (let n = Math.min(pw.length, cw.length); n > 0; n--) {
+        if (pw.slice(-n).join(' ') === cw.slice(0, n).join(' ')) { overlap = n; break; }
+      }
+      if (overlap) t = cw.slice(overlap).join(' ').trim();
+    }
+    if (t) out.push({ seconds: seg.seconds, text: t });
+    prev = seg.text;
+  }
+  return out;
+}
+
+function tsToSeconds(ts) {
+  const m = String(ts || '').match(/^(\d+):(\d{2})(?::(\d{2}))?$/);
+  if (!m) return null;
+  return m[3] ? Number(m[1]) * 3600 + Number(m[2]) * 60 + Number(m[3]) : Number(m[1]) * 60 + Number(m[2]);
 }
 
 /** Best-effort transcript: Agent Reach subtitle -> yt-dlp auto-subs -> Agent Reach transcribe (Whisper). */
@@ -154,23 +202,31 @@ function getTranscript(url, result) {
   result.warnings.push(`youtube subtitle: ${sub.json?.error?.message || sub.stderr || 'failed'}`);
 
   // yt-dlp auto-generated subtitles (does not depend on Agent Reach channel state).
-  const tmp = `/tmp/video-skill-subs-${Date.now()}`;
-  runYtDlp(['--skip-download', '--write-auto-subs', '--write-subs', '--sub-langs', 'en.*', '--sub-format', 'vtt', '-o', `${tmp}.%(ext)s`, url.href], 180000);
-  try {
-    const dir = tmp.slice(0, tmp.lastIndexOf('/'));
-    const prefix = tmp.slice(tmp.lastIndexOf('/') + 1);
-    const files = readdirSync(dir).filter(f => f.startsWith(prefix) && f.endsWith('.vtt'));
-    for (const f of files) {
-      const text = cleanVtt(readFileSync(`${dir}/${f}`, 'utf8'));
-      if (text) {
-        result.transcript = text;
-        result.source.retrievalTools.push('yt-dlp:subtitle');
-        result.evidence.push({ claim: 'Transcript retrieved via yt-dlp auto-generated subtitles.', sourceType: 'external-doc', confidence: 'medium', notes: 'Auto-generated; verify against the video.' });
-        for (const f2 of files) { try { unlinkSync(`${dir}/${f2}`); } catch {} }
-        return;
+  // YouTube rate-limits subtitle fetches intermittently (HTTP 429); retry a few
+  // times with backoff before giving up so a transient 429 doesn't erase evidence.
+  const subArgs = (tmp) => ['--skip-download', '--write-auto-subs', '--write-subs', '--sub-langs', 'en.*', '--sub-format', 'vtt', '-o', `${tmp}.%(ext)s`, url.href];
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const tmp = `/tmp/video-skill-subs-${Date.now()}-${attempt}`;
+    runYtDlp(subArgs(tmp), 180000);
+    try {
+      const dir = tmp.slice(0, tmp.lastIndexOf('/'));
+      const prefix = tmp.slice(tmp.lastIndexOf('/') + 1);
+      const files = readdirSync(dir).filter(f => f.startsWith(prefix) && f.endsWith('.vtt'));
+      for (const f of files) {
+        const raw = readFileSync(`${dir}/${f}`, 'utf8');
+        const text = cleanVtt(raw);
+        if (text) {
+          result.transcript = text;
+          result.transcriptSegments = parseVttSegments(raw);
+          result.source.retrievalTools.push('yt-dlp:subtitle');
+          result.evidence.push({ claim: 'Transcript retrieved via yt-dlp auto-generated subtitles.', sourceType: 'external-doc', confidence: 'medium', notes: 'Auto-generated; verify against the video.' });
+          for (const f2 of files) { try { unlinkSync(`${dir}/${f2}`); } catch {} }
+          return;
+        }
       }
-    }
-  } catch {}
+    } catch {}
+    if (attempt < 2) { try { spawnSync('sleep', ['3']); } catch {} }
+  }
 
   if (!result.transcript) {
     const transcribe = runAgentReach(['youtube', 'transcribe', url.href], 300000);
