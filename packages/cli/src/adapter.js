@@ -23,6 +23,30 @@ function runCmd(bin, args, timeoutMs = 120000) {
 function runAgentReach(args, timeoutMs) { return runCmd('agent-reach', args, timeoutMs); }
 function runYtDlp(args, timeoutMs) { return runCmd('yt-dlp', ['--no-update', '--no-warnings', ...(args || [])], timeoutMs); }
 
+/**
+ * Fetch just the fields we need from yt-dlp. `--dump-json` emits huge metadata
+ * (every format/storyboard) that can exceed maxBuffer (ENOBUFS) on some videos;
+ * `--print` with a delimiter keeps the output small and reliable.
+ */
+function ytDlpMetadata(url, timeoutMs = 120000) {
+  // Use a separator without '%' — yt-dlp treats %% as an escaped literal '%'.
+  const sep = '===VSP===';
+  const fields = ['%(title)s', '%(channel)s', '%(uploader)s', '%(upload_date)s', '%(duration)s', '%(description)s'];
+  const args = ['--skip-download', '--no-playlist', ...fields.flatMap(f => ['--print', f + '\n' + sep]), url.href];
+  const r = runYtDlp(args, timeoutMs);
+  if (r.status !== 0 || r.error) return null;
+  const parts = (r.stdout || '').split(sep).map(p => p.replace(/^\n+|\n+$/g, '').trim());
+  if (parts.length < 7) return null;
+  const na = v => (v && v !== 'NA') ? v : undefined;
+  return {
+    title: na(parts[0]),
+    author: na(parts[1]) || na(parts[2]),
+    publishedAt: na(parts[3]),
+    duration: na(parts[4]) ? Number(parts[4]) : undefined,
+    description: na(parts[5]),
+  };
+}
+
 export function getAgentReachStatus() {
   const which = runCmd('sh', ['-lc', 'command -v agent-reach']);
   const path = (which.stdout || '').trim();
@@ -190,14 +214,13 @@ export async function extractVideo(inputUrl) {
     if (!read.json?.ok) result.warnings.push(`youtube read: ${read.json?.error?.message || read.stderr || 'failed'}`);
 
     if (!meta?.description) {
-      const yd = runYtDlp(['--dump-json', url.href], 120000);
-      const ym = yd.json ? ytDlpMeta(yd.json) : null;
-      result.raw.ytdlp = ym ? { title: ym.title, author: ym.author, duration: ym.duration, descriptionLength: (ym.description || '').length } : (yd.stderr || 'failed');
+      const ym = ytDlpMetadata(url, 120000);
+      result.raw.ytdlp = ym ? { title: ym.title, author: ym.author, duration: ym.duration, descriptionLength: (ym.description || '').length } : 'failed';
       if (ym) {
         meta = { ...(meta || {}), ...Object.fromEntries(Object.entries(ym).filter(([, v]) => v != null)) };
         result.source.retrievalTools.push('yt-dlp');
       } else {
-        result.warnings.push(`yt-dlp: ${yd.stderr || 'failed'}`);
+        result.warnings.push('yt-dlp: metadata unavailable');
       }
     }
 
