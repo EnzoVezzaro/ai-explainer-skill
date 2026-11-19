@@ -417,7 +417,11 @@ dialog::backdrop { background: rgba(50, 23, 13, .6); }
 
 /* Footer + toast -------------------------------------------------------- */
 footer { border-top: 2px solid var(--ink); padding: 34px 0 44px; font: 11px/1.7 var(--mono); color: var(--ink-65); }
-footer .foot-inner { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 18px; align-items: flex-start; }
+footer .foot-inner {
+  max-width: var(--max); margin-inline: auto; padding-inline: 24px;
+  display: flex; flex-wrap: wrap; justify-content: space-between;
+  gap: 18px; align-items: flex-start;
+}
 footer nav { display: flex; flex-wrap: wrap; gap: 8px 18px; }
 footer a { text-decoration: none; }
 footer a:hover { color: var(--ink); text-decoration: underline; }
