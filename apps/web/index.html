@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Video Skill — Turn video tutorials into skills your agent can execute</title>
-<meta name="description" content="An open-source CLI and Agent Skill that turns a public tutorial URL into a portable, tool-grounded skill for Codex, Claude Code, OpenCode and Cursor.">
+<title>Video Skill: turn a tutorial URL into an Agent Skill</title>
+<meta name="description" content="Give your coding agent a public video URL. Video Skill extracts the workflow, compiles a portable Agent Skill, and labels each step by source.">
 <meta name="theme-color" content="#f6fff0">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Video Skill">
 <meta property="og:url" content="https://enzovezzaro.github.io/ai-explainer-skill/">
-<meta property="og:title" content="Video Skill — Turn video tutorials into skills your agent can execute">
-<meta property="og:description" content="Give your coding agent a public URL. Extract the workflow, compile a portable Agent Skill, verify the result.">
+<meta property="og:title" content="Video Skill: turn a tutorial URL into an Agent Skill">
+<meta property="og:description" content="Video Skill reads a tutorial video, writes a portable Agent Skill, and leaves execution to your coding harness.">
 <meta property="og:image" content="https://enzovezzaro.github.io/ai-explainer-skill/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://enzovezzaro.github.io/ai-explainer-skill/">
@@ -55,24 +55,24 @@
     <div class="wrap">
       <div class="kicker">
         <span><b>01 / Live</b></span><span class="sep">/</span>
-        <span>Open source · MIT</span><span class="sep">/</span>
+        <span>Free and open source · MIT</span><span class="sep">/</span>
         <span>Release <b>v1.3.0</b></span>
       </div>
-      <h1>Video tutorials in.<br><span class="acid">Agent Skills</span> out.</h1>
-      <p class="lede">Give your coding agent a public video URL. Video Skill extracts the workflow the tutorial actually demonstrates, compiles it into a portable Agent Skill, and hands it to your harness — you decide what runs.</p>
+      <h1>Turn a tutorial URL into a<br><span class="acid">portable Agent Skill</span>.</h1>
+      <p class="lede">A video link leaves your coding agent to guess the steps. Video Skill reads the public description, captions and transcript, then writes a skill your agent can follow. Your harness runs it only when you say so.</p>
       <div class="hero-actions">
-        <a class="btn btn-primary" href="playground.html">Try the playground</a>
-        <a class="btn" href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">View the repository</a>
-        <a class="btn" href="docs/">Read the docs</a>
+        <a class="btn btn-primary" href="playground.html">Try it in the playground</a>
+        <a class="btn" href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">Read the source</a>
+        <a class="btn" href="docs/">Read the documentation</a>
       </div>
 
       <div class="install">
-        <div class="install-head"><span>Install the CLI</span><span>Node 20+ · no account · no hosted DB</span></div>
+        <div class="install-head"><span>Install the CLI</span><span>Node 20+ · no account · no database to host</span></div>
         <div class="install-body">
           <code id="install-command">npx video-skill install</code>
           <button class="copy" type="button" data-copy="npx video-skill install" aria-label="Copy the install command">Copy</button>
         </div>
-        <p class="install-foot">npm latest: <strong>1.2.0</strong> · source release: <a href="https://github.com/EnzoVezzaro/ai-explainer-skill/releases/tag/v1.3.0" target="_blank" rel="noopener">v1.3.0</a> · <a href="docs/installation.html">install from source</a></p>
+        <p class="install-foot">npm publishes <strong>1.2.0</strong> · <a href="https://github.com/EnzoVezzaro/ai-explainer-skill/releases/tag/v1.3.0" target="_blank" rel="noopener">source release v1.3.0</a> · <a href="docs/installation.html">install from source</a></p>
       </div>
 
       <div class="chips" aria-label="Works with">
@@ -80,73 +80,73 @@
         <span class="chip on">Claude Code</span>
         <span class="chip on">OpenCode</span>
         <span class="chip">Cursor (compatible)</span>
-        <span class="chip">MIT licensed</span>
+        <span class="chip">MIT license</span>
       </div>
 
       <p class="live">
-        <span>Production</span>
+        <span>Production site</span>
         <a href="https://enzovezzaro.github.io/ai-explainer-skill/">enzovezzaro.github.io/ai-explainer-skill</a>
-        <span class="dot">Live on GitHub Pages</span>
+        <span class="dot">Published with GitHub Pages</span>
       </p>
     </div>
   </header>
 
   <section class="section" id="how-it-works" aria-labelledby="how-heading">
     <div class="wrap">
-      <div class="sec-head"><b>// The pipeline</b><span>URL → evidence → skill → agent</span></div>
-      <h2 id="how-heading">One URL in. A <span class="acid">built skill</span> out.</h2>
-      <p>The website prepares a skill; it never executes a tutorial for you. Extraction is grounded in the video's public description, captions and transcript, and every claim is labeled by source.</p>
+      <div class="sec-head"><b>// How it works</b><span>URL → evidence → skill → agent</span></div>
+      <h2 id="how-heading">From a video link to <span class="acid">files your agent can read</span>.</h2>
+      <p>This site writes files. Your coding harness decides what to run. Extraction uses the video's public description, captions and transcript, and each step keeps its source label.</p>
       <div class="steps">
         <article class="step">
-          <span class="num">01 / LEARN</span>
-          <h3>Retrieve</h3>
-          <p>Read a public YouTube, Bilibili, Instagram, X / Twitter, TikTok or web page URL. Captions or Whisper transcripts, chapters, links and tools become structured evidence.</p>
+          <span class="num">01 / Learn</span>
+          <h3>Read the source</h3>
+          <p>Public YouTube, Bilibili, Instagram, X, TikTok and web page URLs all work. Captions, Whisper transcripts when configured, chapters, links and tools become structured evidence.</p>
         </article>
         <article class="step">
-          <span class="num">02 / EXPLAIN</span>
-          <h3>Understand</h3>
-          <p>Separate spoken instructions from visible demos, external docs and inference. Nothing is presented as verified when it was only guessed.</p>
+          <span class="num">02 / Explain</span>
+          <h3>Keep the sources separate</h3>
+          <p>Spoken instructions stay separate from visible demos, linked docs and guesses. Missing captions are reported as gaps.</p>
         </article>
         <article class="step">
-          <span class="num">03 / CREATE</span>
-          <h3>Compile</h3>
-          <p>Generate a portable skill: <code>SKILL.md</code>, <code>references/tools.md</code>, <code>walkthrough.md</code>, <code>source.md</code> and <code>dependencies.md</code>.</p>
+          <span class="num">03 / Create</span>
+          <h3>Write the skill folder</h3>
+          <p>The output is a folder with <code>SKILL.md</code> and references for tools, walkthrough, source evidence and dependencies: <code>references/tools.md</code>, <code>walkthrough.md</code>, <code>source.md</code> and <code>dependencies.md</code>.</p>
         </article>
         <article class="step">
-          <span class="num">04 / VERIFY</span>
-          <h3>Hand off</h3>
-          <p>Install into your harness and run the workflow with your approval. Confirm the result with real tests, logs or screenshots — never a simulated success.</p>
+          <span class="num">04 / Verify</span>
+          <h3>Hand it to your harness</h3>
+          <p>Install the skill and run the workflow with your approval. Tests, logs and screenshots count as evidence. Prepared skills stay marked as prepared.</p>
         </article>
       </div>
-      <p class="note">External content is untrusted. Consequential actions require explicit authorization, and the tool never claims a reproduction it did not execute.</p>
+      <p class="note">External content is untrusted. Actions that change files or spend money need your approval. Video Skill does not claim a reproduction it never ran.</p>
     </div>
   </section>
 
   <section class="section alt" id="project" aria-labelledby="project-heading">
     <div class="wrap">
-      <div class="sec-head"><b>// Real project facts</b><span>Verified against the repository</span></div>
-      <h2 id="project-heading">Open source, <span class="acid">in the open</span>.</h2>
-      <p>No signup, no hosted database. The source, the release and this website are all public; the dashboard and MCP server run on your machine.</p>
+      <div class="sec-head"><b>// The project in public</b><span>Check the source yourself</span></div>
+      <h2 id="project-heading">You can <span class="acid">read every line</span>.</h2>
+      <p>There is no signup and no hosted database. The source, releases and this site are public. The dashboard and MCP server run on your machine.</p>
       <div class="facts">
         <article class="fact">
           <span class="tag">GitHub repository</span>
           <a class="value" href="https://github.com/EnzoVezzaro/ai-explainer-skill" target="_blank" rel="noopener">github.com/EnzoVezzaro/ai-explainer-skill</a>
-          <p>Source code, issues, discussions and the full changelog. Public since the v1.3.0 release.</p>
+          <p>Source, issues and release history. The repository became public with v1.3.0.</p>
         </article>
         <article class="fact">
           <span class="tag">Production URL</span>
           <a class="value" href="https://enzovezzaro.github.io/ai-explainer-skill/">enzovezzaro.github.io/ai-explainer-skill</a>
-          <p>Deployed from <strong>apps/web</strong> by GitHub Actions on every push to <strong>main</strong> and on each published release.</p>
+          <p>Built from <strong>apps/web</strong> by GitHub Actions. Each push to <strong>main</strong> and each release publishes it.</p>
         </article>
         <article class="fact">
           <span class="tag">Latest release</span>
           <a class="value" href="https://github.com/EnzoVezzaro/ai-explainer-skill/releases/tag/v1.3.0" target="_blank" rel="noopener">v1.3.0 · CLI 1.3.0</a>
-          <p>MCP-driven dashboard, ChatGPT connection flows, and a yt-dlp fix for videos with large metadata.</p>
+          <p>Adds the MCP workflow view, a ChatGPT connection flow, and a yt-dlp fix for large video metadata.</p>
         </article>
         <article class="fact">
           <span class="tag">Local dashboard</span>
           <span class="value">npm run dev → localhost:3002</span>
-          <p>Start the dashboard and MCP server locally. The landing page is online; the agent workflow stays on your machine.</p>
+          <p>Run the dashboard and MCP server yourself. This site is public. The agent workflow stays on your machine.</p>
         </article>
       </div>
     </div>
@@ -154,20 +154,20 @@
 
   <section class="section" aria-labelledby="mcp-heading">
     <div class="wrap">
-      <div class="sec-head"><b>// Under the hood</b><span>CLI + MCP + Agent Skill</span></div>
-      <h2 id="mcp-heading">Built for the agent you <span class="acid">already use</span>.</h2>
-      <p>The CLI works standalone via <code>npx</code>. The same pipeline is exposed over MCP at <code>http://localhost:3002/mcp</code>, so your coding agent can drive a tracked workflow instead of improvising one.</p>
+      <div class="sec-head"><b>// What ships with it</b><span>CLI + MCP + Agent Skill</span></div>
+      <h2 id="mcp-heading">The same pipeline, <span class="acid">in three places</span>.</h2>
+      <p>The CLI runs on its own with <code>npx</code>. The MCP server at <code>http://localhost:3002/mcp</code> exposes the same steps as tools, so another agent can start a run and watch it.</p>
       <div class="tool-grid">
         <div class="tool-box">
-          <h3>Seven MCP tools</h3>
+          <h3>MCP tools</h3>
           <ul>
-            <li>extract — structured evidence from a URL</li>
-            <li>compile — build a portable skill</li>
-            <li>validate — check the generated skill</li>
-            <li>list_collections — saved sources</li>
-            <li>run_workflow — start a tracked build</li>
-            <li>workflow_status — steps and agent thread</li>
-            <li>list_workflows — previous runs</li>
+            <li>extract: structured evidence from a URL</li>
+            <li>compile: build a portable skill</li>
+            <li>validate: check the generated skill</li>
+            <li>list_collections: saved sources</li>
+            <li>run_workflow: start a tracked build</li>
+            <li>workflow_status: steps and agent thread</li>
+            <li>list_workflows: previous runs</li>
           </ul>
         </div>
         <div class="tool-box">
@@ -191,13 +191,13 @@
 
   <section class="section alt cta" aria-labelledby="cta-heading">
     <div class="wrap">
-      <div class="sec-head"><b>// Start here</b><span>~30 seconds to install</span></div>
-      <h2 id="cta-heading">Give your agent a <span class="acid">video URL</span>.</h2>
-      <p>Try the playground first, install the CLI when you are ready, or read how the pipeline handles evidence and trust.</p>
+      <div class="sec-head"><b>// Get started</b><span>No account needed</span></div>
+      <h2 id="cta-heading">Pick a tutorial and <span class="acid">build the skill</span>.</h2>
+      <p>Try the playground without installing. Install the CLI when you want the skill in your own harness. The security page explains how external content is handled.</p>
       <div class="actions">
         <a class="btn btn-primary" href="playground.html">Open the playground</a>
-        <a class="btn" href="docs/installation.html">Installation guide</a>
-        <a class="btn" href="docs/security.html">Security model</a>
+        <a class="btn" href="docs/installation.html">Read the install guide</a>
+        <a class="btn" href="docs/security.html">Read the security rules</a>
       </div>
     </div>
   </section>
@@ -207,7 +207,7 @@
   <div class="wrap foot-inner">
     <div>
       <a class="brand" href="index.html"><img src="assets/logo.svg" alt="Video Skill" width="176" height="42"></a>
-      <div>Open source under MIT · <span id="year"></span></div>
+      <div>MIT licensed · <span id="year"></span></div>
       <div><a href="https://enzovezzaro.github.io/ai-explainer-skill/">enzovezzaro.github.io/ai-explainer-skill</a></div>
     </div>
     <nav aria-label="Footer">
